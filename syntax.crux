@@ -1,0 +1,83 @@
+// Comments
+
+// Variable Definition
+var number = 1;
+var nullVariable = nil;
+
+// Function body
+fun foo(a, b)
+{
+	return a + b;
+}
+
+// If statements
+if (true and !false)
+{
+	print("True");
+}
+
+if (false or true)
+{
+	print("True");
+}
+
+// Loops
+for (var i = 0; i < 10; i++)
+{
+	print(i);
+}
+
+var i = 0;
+while (i < 10)
+{
+	print(i);
+	i++;
+}
+
+
+// Function call
+var result = foo(1, 2);
+
+// Print statement
+print("Hello from Crux!");
+
+// Classes
+class MyClass
+{
+	var a;
+	var b;
+
+	fun init(a, b)
+	{
+		this.a = a;
+		this.b = b;
+	}
+
+	fun sum()
+	{
+		return this.a + this.b;
+	}
+}
+
+var classInstance = MyClass(1, 2);
+print(classInstance.sum());
+
+// Class inheritance
+class MySubClass << MyClass 
+{
+	var c;
+
+	fun init(a, b, c)
+	{
+		super.init(a, b);
+		this.c = c;
+	}
+
+	fun sum()
+	{
+		return super.sum() + c;
+	}
+}
+
+var subClassInstance = MySubClass(1, 2, 3);
+print(subClassInstance.sum());
