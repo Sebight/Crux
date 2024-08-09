@@ -2,8 +2,12 @@
 
 // < > != ==
 
-// "Ahoj!!!"
+// "123"
 
 // 0.25
 
-print("Wassup");
+print("Hello");
+
+/* multi line
+comment
+*/

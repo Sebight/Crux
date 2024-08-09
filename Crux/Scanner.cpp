@@ -37,7 +37,14 @@ void Scanner::scanToken()
 		{
 			while (peek() != '\n' && !isAtEnd()) advance();
 		}
-		else
+		else if (match('*')) {
+			while (peek() != '*' && peekNext() != '/' && !isAtEnd()) {
+				if (peek() == '\n') m_line++;
+				advance();
+			}
+			advance();
+			advance();
+		} else 
 		{
 			addToken(TokenType::SLASH);
 		}
