@@ -1,6 +1,6 @@
 #include "Scanner.h"
 
-std::vector<Token> Scanner::scanTokens()
+std::vector<Ptr<Token>> Scanner::scanTokens()
 {
 	while (!isAtEnd())
 	{
@@ -8,7 +8,7 @@ std::vector<Token> Scanner::scanTokens()
 		scanToken();
 	}
 
-	m_tokens.push_back(Token(TokenType::END_OF_FILE, "", "", m_line));
+	m_tokens.push_back(std::make_shared<Token>(TokenType::END_OF_FILE, "", "", m_line));
 	return m_tokens;
 }
 
@@ -97,7 +97,7 @@ void Scanner::addToken(TokenType type)
 		text = text.substr(1, text.size() - 2);
 	}
 
-	m_tokens.emplace_back(type, text, makeOptLiteral(type, text), m_line);
+	m_tokens.emplace_back(std::make_shared<Token>(type, text, makeOptLiteral(type, text), m_line));
 }
 
 void Scanner::string()

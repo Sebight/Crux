@@ -4,11 +4,12 @@
 #include "Token.h"
 #include <vector>
 #include <map>
+#include "Types.h"
 
 class Scanner {
 public:
 	Scanner(const std::string& source) : m_source(source) {}
-	std::vector<Token> scanTokens();
+	std::vector<Ptr<Token>> scanTokens();
 	void scanToken();
 	void addToken(TokenType type);
 	void addToken(TokenType type, Literal literal);
@@ -41,7 +42,7 @@ private:
 		{"while", TokenType::WHILE}
 	};
 
-	std::vector<Token> m_tokens;
+	std::vector<Ptr<Token>> m_tokens;
 
 	bool isAtEnd() const {
 		return m_current >= m_source.size();

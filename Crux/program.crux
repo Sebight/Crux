@@ -6,7 +6,9 @@
 
 // 0.25
 
-print("Hello");
+// print("Hello");
+
+2 * 3 - 2
 
 /* multi line
 comment

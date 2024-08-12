@@ -5,7 +5,6 @@
 #include <memory>
 #include <vector>
 
-
 class ASTNode {
 public:
 	ASTNode() = default;

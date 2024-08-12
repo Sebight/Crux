@@ -2,6 +2,7 @@
 
 #include "Crux.h"
 #include "Scanner.h"
+#include "Parser.h"
 
 bool Crux::hadError = false;
 
@@ -52,11 +53,10 @@ void Crux::runPrompt()
 void Crux::run(const std::string& source)
 {
 	Scanner scanner = Scanner(source);
-	std::vector<Token> tokens = scanner.scanTokens();
-
-	for (auto& token : tokens) {
-		printf("%s\n", token.toString().c_str());
-	}
+	std::vector<Ptr<Token>> tokens = scanner.scanTokens();
+	
+	Parser parser = Parser(tokens);
+	Ptr<Expr> expr = parser.parse();
 }
 
 void Crux::error(int line, const std::string& message)

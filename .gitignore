@@ -12,3 +12,5 @@ _deps
 CMakeUserPresets.json
 
 Crux/.vs/
+
+Crux/out/
