@@ -36,7 +36,11 @@ public:
 	void visitAssign(Ptr<AssignExpr> expr) override {};
 	void visitLogical(Ptr<LogicalExpr> expr) override {};
 
-	void interpret(Ptr<Expr> expr);
+	void visitExprStmt(Ptr<ExprStmt> stmt) override;
+	void visitPrintStmt(Ptr<PrintStmt> stmt) override;
+
+	void interpret(std::vector<Ptr<Stmt>> statements);
+	void execute(Ptr<Stmt> stmt);
 private:
 	std::stack<Ptr<CruxObject>> m_results;
 

@@ -6,14 +6,20 @@ Parser::Parser(std::vector<Ptr<Token>> tokens)
 	m_currentTokenIndex = 0;
 }
 
-Ptr<Expr> Parser::parse()
+std::vector<Ptr<Stmt>> Parser::parse()
 {
-	try {
-		return expression();
+	std::vector<Ptr<Stmt>> statements;
+	while (!isAtEnd()) {
+		try {
+			statements.push_back(statement());
+		}
+		catch (const ParseError e) {
+			printf("Error parsing statement: %s\n", e.what());
+			break;
+		}
 	}
-	catch (ParseError) {
-		return nullptr;
-	}
+
+	return statements;
 }
 
 Ptr<Expr> Parser::expression()
@@ -97,7 +103,29 @@ Ptr<Expr> Parser::primary()
 	}
 
 	// Expected expression
-	throw ParseError();
+
+	throw ParseError("Expected expression.", peek()->line);
+}
+
+Ptr<Stmt> Parser::statement()
+{
+	if (match({ TokenType::PRINT })) return printStatement();
+
+	return expressionStatement();
+}
+
+Ptr<Stmt> Parser::printStatement()
+{
+	Ptr<Expr> value = expression();
+	consume(TokenType::SEMICOLON, "Expect ';' after value.");
+	return std::make_shared<PrintStmt>(value);
+}
+
+Ptr<Stmt> Parser::expressionStatement()
+{
+	Ptr<Expr> expr = expression();
+	consume(TokenType::SEMICOLON, "Expect ';' after expression.");
+	return std::make_shared<ExprStmt>(expr);
 }
 
 void Parser::synchronize() {

@@ -165,17 +165,22 @@ void Interpreter::visitBinary(Ptr<BinaryExpr> bin) {
 	}
 }
 
-void Interpreter::interpret(Ptr<Expr> expr)
+void Interpreter::interpret(std::vector<Ptr<Stmt>> statements)
 {
 	try {
-		eval(expr);
-		// We get the result at the top of the stack
-		Ptr<CruxObject> result = m_results.top();
-		printf("%s\n", result->toString().c_str());
+		for (auto& statement : statements) {
+			execute(statement);
+		}
 	}
 	catch (const std::exception& e) {
+		// TODO: Proper handling for runtime errors
 		printf("Error: %s\n", e.what());
 	}
+}
+
+void Interpreter::execute(Ptr<Stmt> stmt)
+{
+	stmt->accept(*this);
 }
 
 void Interpreter::eval(Ptr<Expr> expr)
@@ -213,4 +218,17 @@ bool Interpreter::isEqual(Ptr<CruxObject> a, Ptr<CruxObject> b)
 
 
 	return a->boolean == b->boolean;
+}
+
+void Interpreter::visitExprStmt(Ptr<ExprStmt> stmt)
+{
+	eval(stmt->expr);
+}
+
+void Interpreter::visitPrintStmt(Ptr<PrintStmt> stmt)
+{
+	eval(stmt->expr);
+	Ptr<CruxObject> result = m_results.top();
+	m_results.pop();
+	printf("%s\n", result->toString().c_str());
 }

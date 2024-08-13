@@ -79,3 +79,25 @@ public:
 	LogicalExpr(Ptr<Expr> left, Ptr<Token> op, Ptr<Expr> right);
 	void accept(Visitor& visitor) override;
 };
+
+class Stmt : public ASTNode, public std::enable_shared_from_this<Stmt> {
+public:
+	Stmt() = default;
+	~Stmt() override = default;
+};
+
+class ExprStmt : public Stmt {
+public:
+	Ptr<Expr> expr;
+
+	ExprStmt(Ptr<Expr> expr);
+	void accept(Visitor& visitor) override;
+};
+
+class PrintStmt : public Stmt {
+public:
+	Ptr<Expr> expr;
+
+	PrintStmt(Ptr<Expr> expr);
+	void accept(Visitor& visitor) override;
+};

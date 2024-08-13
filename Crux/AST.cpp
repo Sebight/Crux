@@ -70,3 +70,23 @@ LogicalExpr::LogicalExpr(Ptr<Expr> left, Ptr<Token> op, Ptr<Expr> right)
 	: left(std::move(left)), op(std::move(op)), right(std::move(right))
 {
 }
+
+ExprStmt::ExprStmt(Ptr<Expr> expr)
+	: expr(std::move(expr))
+{
+}
+
+void ExprStmt::accept(Visitor& visitor)
+{
+	visitor.visitExprStmt(static_pointer_cast<ExprStmt>(shared_from_this()));
+}
+
+PrintStmt::PrintStmt(Ptr<Expr> expr)
+	: expr(std::move(expr))
+{
+}
+
+void PrintStmt::accept(Visitor& visitor)
+{
+	visitor.visitPrintStmt(static_pointer_cast<PrintStmt>(shared_from_this()));
+}

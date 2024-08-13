@@ -57,13 +57,13 @@ void Crux::run(const std::string& source)
 	std::vector<Ptr<Token>> tokens = scanner.scanTokens();
 
 	Parser parser = Parser(tokens);
-	Ptr<Expr> expr = parser.parse();
+	std::vector<Ptr<Stmt>> statements = parser.parse();
 
 	// TODO: Errors
 	//if (hadError) return;
 
 	Interpreter interpreter = Interpreter();
-	interpreter.interpret(expr);
+	interpreter.interpret(statements);
 
 	// TODO: Runtime 
 }
