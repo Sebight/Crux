@@ -11,7 +11,7 @@ std::vector<Ptr<Stmt>> Parser::parse()
 	std::vector<Ptr<Stmt>> statements;
 	while (!isAtEnd()) {
 		try {
-			statements.push_back(statement());
+			statements.push_back(declaration());
 		}
 		catch (const ParseError e) {
 			printf("Error parsing statement: %s\n", e.what());
@@ -24,7 +24,7 @@ std::vector<Ptr<Stmt>> Parser::parse()
 
 Ptr<Expr> Parser::expression()
 {
-	return equality();
+	return assignment();
 }
 
 Ptr<Expr> Parser::equality() {
@@ -82,7 +82,6 @@ Ptr<Expr> Parser::unary()
 		Ptr<Expr> right = unary();
 		return std::make_shared<UnaryExpr>(op, right);
 	}
-
 	return primary();
 }
 
@@ -96,6 +95,10 @@ Ptr<Expr> Parser::primary()
 		return std::make_shared<LiteralExpr>(previous());
 	}
 
+	if (match({ TokenType::IDENTIFIER })) {
+		return std::make_shared<VariableExpr>(previous());
+	}
+
 	if (match({ TokenType::LEFT_PAREN })) {
 		Ptr<Expr> expr = expression();
 		consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
@@ -105,6 +108,27 @@ Ptr<Expr> Parser::primary()
 	// Expected expression
 
 	throw ParseError("Expected expression.", peek()->line);
+}
+
+Ptr<Expr> Parser::assignment()
+{
+	Ptr<Expr> expr = equality();
+
+	if (match({ TokenType::EQUAL })) {
+		Ptr<Token> equals = previous();
+		Ptr<Expr> value = assignment();
+
+		try {
+			VariableExpr& var = dynamic_cast<VariableExpr&>(*expr);
+			// Ptr<Token> name = std::make_shared<Token>(var.name->type, var.name->lexeme, var.name->literal, var.name->line);
+			return std::make_shared<AssignExpr>(var.name, value);
+		}
+		catch (const std::bad_cast& e) {
+			throw ParseError("Invalid assignment target.", equals->line);
+		}
+	}
+
+	return expr;
 }
 
 Ptr<Stmt> Parser::statement()
@@ -126,6 +150,33 @@ Ptr<Stmt> Parser::expressionStatement()
 	Ptr<Expr> expr = expression();
 	consume(TokenType::SEMICOLON, "Expect ';' after expression.");
 	return std::make_shared<ExprStmt>(expr);
+}
+
+Ptr<Stmt> Parser::declaration()
+{
+	try {
+		if (match({ TokenType::VAR })) return varDeclaration();
+		return statement();
+	}
+	catch (const ParseError e) {
+		printf("Error parsing declaration: %s\n", e.what());
+		synchronize();
+		return nullptr;
+	}
+}
+
+Ptr<Stmt> Parser::varDeclaration()
+{
+	Ptr<Token> name = consume(TokenType::IDENTIFIER, "Expected variable name.");
+
+	Ptr<Expr> initializer = nullptr;
+
+	if (match({ TokenType::EQUAL })) {
+		initializer = expression();
+	}
+	consume(TokenType::SEMICOLON, "Expected ';' after variable declaration.");
+
+	return std::make_shared<VarStmt>(name, initializer);
 }
 
 void Parser::synchronize() {

@@ -54,7 +54,7 @@ VariableExpr::VariableExpr(Ptr<Token> name)
 void AssignExpr::accept(Visitor& visitor)
 {
 	visitor.visitAssign(static_pointer_cast<AssignExpr>(shared_from_this()));
-}	
+}
 
 AssignExpr::AssignExpr(Ptr<Token> name, Ptr<Expr> value)
 	: name(std::move(name)), value(std::move(value))
@@ -89,4 +89,15 @@ PrintStmt::PrintStmt(Ptr<Expr> expr)
 void PrintStmt::accept(Visitor& visitor)
 {
 	visitor.visitPrintStmt(static_pointer_cast<PrintStmt>(shared_from_this()));
+}
+
+VarStmt::VarStmt(Ptr<Token> name, Ptr<Expr> initializer)
+	: name(std::move(name)), initializer(std::move(initializer))
+{
+}
+
+
+void VarStmt::accept(Visitor& visitor)
+{
+	visitor.visitVarStmt(static_pointer_cast<VarStmt>(shared_from_this()));
 }

@@ -101,3 +101,12 @@ public:
 	PrintStmt(Ptr<Expr> expr);
 	void accept(Visitor& visitor) override;
 };
+
+class VarStmt : public Stmt {
+public:
+	Ptr<Token> name;
+	Ptr<Expr> initializer;
+
+	VarStmt(Ptr<Token> name, Ptr<Expr> initializer);
+	void accept(Visitor& visitor) override;
+};

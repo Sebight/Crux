@@ -3,29 +3,6 @@
 #include <vector>
 #include "AST.h"
 
-class ParseError : public std::exception {
-public:
-	ParseError(std::string message, int line = -1) : m_line(line), m_message(message) {
-		message = "";
-
-		if (m_line != -1) {
-			message = "Parse Error at line " + std::to_string(m_line) + ": " + m_message;
-		}
-		else {
-			message = "Parse Error: " + m_message;
-		}
-
-		m_message = message;
-	}
-	const char* what() const noexcept override {
-		return m_message.c_str();
-	}
-
-private:
-	int m_line;
-	std::string m_message;
-};
-
 class Parser {
 public:
 	Parser(std::vector<Ptr<Token>> tokens);
@@ -44,10 +21,13 @@ private:
 	Ptr<Expr> factor();
 	Ptr<Expr> unary();
 	Ptr<Expr> primary();
+	Ptr<Expr> assignment();
 
 	Ptr<Stmt> statement();
 	Ptr<Stmt> printStatement();
 	Ptr<Stmt> expressionStatement();
+	Ptr<Stmt> declaration();
+	Ptr<Stmt> varDeclaration();
 
 
 	// Helper functions

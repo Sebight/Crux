@@ -35,6 +35,25 @@ void Interpreter::visitGrouping(Ptr<GroupingExpr> group)
 	eval(group->expr);
 }
 
+void Interpreter::visitVariable(Ptr<VariableExpr> expr)
+{
+	Ptr<CruxObject> value = m_env.get(expr->name);
+	if (value == nullptr) {
+		throw CruxRuntimeError("Undefined variable '" + expr->name->lexeme + "'", expr->name->line, expr->name->lexeme);
+	}
+
+	m_results.push(value);
+}
+
+void Interpreter::visitAssign(Ptr<AssignExpr> expr)
+{
+	eval(expr->value);
+	Ptr<CruxObject> value = m_results.top();
+	m_results.pop();
+
+	m_env.assign(expr->name, value);
+}
+
 void Interpreter::visitUnary(Ptr<UnaryExpr> unary) {
 	eval(unary->right);
 
@@ -231,4 +250,17 @@ void Interpreter::visitPrintStmt(Ptr<PrintStmt> stmt)
 	Ptr<CruxObject> result = m_results.top();
 	m_results.pop();
 	printf("%s\n", result->toString().c_str());
+}
+
+void Interpreter::visitVarStmt(Ptr<VarStmt> stmt)
+{
+	Ptr<CruxObject> value = std::make_shared<CruxObject>();
+
+	if (stmt->initializer != nullptr) {
+		eval(stmt->initializer);
+		value = m_results.top();
+		m_results.pop();
+	}
+
+	m_env.define(stmt->name->lexeme, value);
 }

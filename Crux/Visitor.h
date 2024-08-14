@@ -13,6 +13,7 @@ class LogicalExpr;
 
 class ExprStmt;
 class PrintStmt;
+class VarStmt;
 
 
 class Visitor {
@@ -29,4 +30,5 @@ public:
 
 	virtual void visitExprStmt(Ptr<ExprStmt>) = 0;
 	virtual void visitPrintStmt(Ptr<PrintStmt>) = 0;
+	virtual void visitVarStmt(Ptr<VarStmt>) = 0;
 };
