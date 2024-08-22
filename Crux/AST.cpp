@@ -101,3 +101,13 @@ void VarStmt::accept(Visitor& visitor)
 {
 	visitor.visitVarStmt(static_pointer_cast<VarStmt>(shared_from_this()));
 }
+
+BlockStmt::BlockStmt(std::vector<Ptr<Stmt>> statements)
+{
+	this->statements = std::move(statements);
+}
+
+void BlockStmt::accept(Visitor& visitor)
+{
+	visitor.visitBlockStmt(static_pointer_cast<BlockStmt>(shared_from_this()));
+}

@@ -202,6 +202,21 @@ void Interpreter::execute(Ptr<Stmt> stmt)
 	stmt->accept(*this);
 }
 
+void Interpreter::executeBlock(std::vector<Ptr<Stmt>> statements, Env env)
+{
+	Env prev = m_env;
+	try {
+		m_env = env;
+		for (Ptr<Stmt> stmt : statements) {
+			execute(stmt);
+		}
+	}
+	catch (const std::exception& e) {
+		throw e;
+	}
+	m_env = prev;
+}
+
 void Interpreter::eval(Ptr<Expr> expr)
 {
 	expr->accept(*this);
@@ -263,4 +278,9 @@ void Interpreter::visitVarStmt(Ptr<VarStmt> stmt)
 	}
 
 	m_env.define(stmt->name->lexeme, value);
+}
+
+void Interpreter::visitBlockStmt(Ptr<BlockStmt> stmt)
+{
+	executeBlock(stmt->statements, Env(m_env));
 }

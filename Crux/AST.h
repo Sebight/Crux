@@ -110,3 +110,11 @@ public:
 	VarStmt(Ptr<Token> name, Ptr<Expr> initializer);
 	void accept(Visitor& visitor) override;
 };
+
+class BlockStmt : public Stmt {
+public: 
+	std::vector<Ptr<Stmt>> statements;
+	
+	BlockStmt(std::vector<Ptr<Stmt>> statements);
+	void accept(Visitor& visitor) override;
+};

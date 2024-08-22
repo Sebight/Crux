@@ -28,6 +28,7 @@ private:
 	Ptr<Stmt> expressionStatement();
 	Ptr<Stmt> declaration();
 	Ptr<Stmt> varDeclaration();
+	std::vector<Ptr<Stmt>> block();
 
 
 	// Helper functions

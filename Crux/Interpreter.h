@@ -25,9 +25,11 @@ public:
 	void visitExprStmt(Ptr<ExprStmt> stmt) override;
 	void visitPrintStmt(Ptr<PrintStmt> stmt) override;
 	void visitVarStmt(Ptr<VarStmt> stmt) override;
+	void visitBlockStmt(Ptr<BlockStmt> stmt) override;
 
 	void interpret(std::vector<Ptr<Stmt>> statements);
 	void execute(Ptr<Stmt> stmt);
+	void executeBlock(std::vector<Ptr<Stmt>> statements, Env env);
 private:
 	std::stack<Ptr<CruxObject>> m_results;
 	Env m_env;
