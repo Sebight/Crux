@@ -112,9 +112,28 @@ public:
 };
 
 class BlockStmt : public Stmt {
-public: 
+public:
 	std::vector<Ptr<Stmt>> statements;
-	
+
 	BlockStmt(std::vector<Ptr<Stmt>> statements);
+	void accept(Visitor& visitor) override;
+};
+
+class IfStmt : public Stmt {
+public:
+	Ptr<Expr> condition;
+	Ptr<Stmt> thenBranch;
+	Ptr<Stmt> elseBranch;
+
+	IfStmt(Ptr<Expr> condition, Ptr<Stmt> thenBranch, Ptr<Stmt> elseBranch);
+	void accept(Visitor& visitor) override;
+};
+
+class WhileStmt : public Stmt {
+public:
+	Ptr<Expr> cond;
+	Ptr<Stmt> body;
+
+	WhileStmt(Ptr<Expr> cond, Ptr<Stmt> body);
 	void accept(Visitor& visitor) override;
 };

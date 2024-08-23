@@ -54,6 +54,26 @@ void Interpreter::visitAssign(Ptr<AssignExpr> expr)
 	m_env.assign(expr->name, value);
 }
 
+void Interpreter::visitLogical(Ptr<LogicalExpr> expr)
+{
+	eval(expr->left);
+	Ptr<CruxObject> left = m_results.top();
+
+	if (expr->op->type == TokenType::OR) {
+		if (isTruthy(left)) {
+			m_results.push(left);
+			return;
+		}
+	}
+	else {
+		if (!isTruthy(left)) {
+			m_results.push(left);
+		}
+	}
+
+	eval(expr->right);
+}
+
 void Interpreter::visitUnary(Ptr<UnaryExpr> unary) {
 	eval(unary->right);
 
@@ -202,9 +222,9 @@ void Interpreter::execute(Ptr<Stmt> stmt)
 	stmt->accept(*this);
 }
 
-void Interpreter::executeBlock(std::vector<Ptr<Stmt>> statements, Env env)
+void Interpreter::executeBlock(std::vector<Ptr<Stmt>> statements, Env& env)
 {
-	Env prev = m_env;
+	Env& prev = m_env;
 	try {
 		m_env = env;
 		for (Ptr<Stmt> stmt : statements) {
@@ -282,5 +302,35 @@ void Interpreter::visitVarStmt(Ptr<VarStmt> stmt)
 
 void Interpreter::visitBlockStmt(Ptr<BlockStmt> stmt)
 {
-	executeBlock(stmt->statements, Env(m_env));
+	Env newEnv = Env(std::make_shared<Env>(m_env));
+	executeBlock(stmt->statements, newEnv);
+}
+
+void Interpreter::visitIfStmt(Ptr<IfStmt> stmt)
+{
+	eval(stmt->condition);
+	Ptr<CruxObject> cond = m_results.top();
+	m_results.pop();
+
+	if (isTruthy(cond)) {
+		execute(stmt->thenBranch);
+	}
+	else if (stmt->elseBranch != nullptr) {
+		execute(stmt->elseBranch);
+	}
+}
+
+void Interpreter::visitWhileStmt(Ptr<WhileStmt> stmt)
+{
+	eval(stmt->cond);
+	Ptr<CruxObject> cond = m_results.top();
+	m_results.pop();
+
+	while (isTruthy(cond)) {
+		execute(stmt->body);
+
+		eval(stmt->cond);
+		cond = m_results.top();
+		m_results.pop();
+	}
 }

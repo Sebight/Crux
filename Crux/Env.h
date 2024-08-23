@@ -42,6 +42,21 @@ public:
 
 		throw CruxRuntimeError("Undefined variable: " + name->lexeme + ".", name->line, name->lexeme);
 	}
+
+	void dump() {
+		std::string content;
+		size_t index = 0;
+		std::string level = "NESTED";
+		if (m_enclosing == nullptr) {
+			level = "GLOBAL";
+		}
+		content += "[Dumping env]\n";
+		for (auto& [key, value] : m_values) {
+			content += level + " - " + "[" + std::to_string(index) + "] " + key + " => " + value->toString() + "\n";
+			index++;
+		}
+		printf("%s", content.c_str());
+	}
 private:
 	std::unordered_map<std::string, Ptr<CruxObject>> m_values;
 	Ptr<Env> m_enclosing;

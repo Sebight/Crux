@@ -20,16 +20,18 @@ public:
 
 	void visitVariable(Ptr<VariableExpr> expr) override;
 	void visitAssign(Ptr<AssignExpr> expr) override;
-	void visitLogical(Ptr<LogicalExpr> expr) override {};
+	void visitLogical(Ptr<LogicalExpr> expr) override;
 
 	void visitExprStmt(Ptr<ExprStmt> stmt) override;
 	void visitPrintStmt(Ptr<PrintStmt> stmt) override;
 	void visitVarStmt(Ptr<VarStmt> stmt) override;
 	void visitBlockStmt(Ptr<BlockStmt> stmt) override;
+	void visitIfStmt(Ptr<IfStmt> stmt) override;
+	void visitWhileStmt(Ptr<WhileStmt> stmt) override;
 
 	void interpret(std::vector<Ptr<Stmt>> statements);
 	void execute(Ptr<Stmt> stmt);
-	void executeBlock(std::vector<Ptr<Stmt>> statements, Env env);
+	void executeBlock(std::vector<Ptr<Stmt>> statements, Env& env);
 private:
 	std::stack<Ptr<CruxObject>> m_results;
 	Env m_env;

@@ -103,11 +103,30 @@ void VarStmt::accept(Visitor& visitor)
 }
 
 BlockStmt::BlockStmt(std::vector<Ptr<Stmt>> statements)
+	: statements(std::move(statements))
 {
-	this->statements = std::move(statements);
 }
 
 void BlockStmt::accept(Visitor& visitor)
 {
 	visitor.visitBlockStmt(static_pointer_cast<BlockStmt>(shared_from_this()));
+}
+
+IfStmt::IfStmt(Ptr<Expr> condition, Ptr<Stmt> thenBranch, Ptr<Stmt> elseBranch)
+	: condition(std::move(condition)), thenBranch(std::move(thenBranch)), elseBranch(std::move(elseBranch))
+{
+}
+
+void IfStmt::accept(Visitor& visitor)
+{
+	visitor.visitIfStmt(static_pointer_cast<IfStmt>(shared_from_this()));
+}
+
+WhileStmt::WhileStmt(Ptr<Expr> cond, Ptr<Stmt> body) : cond(std::move(cond)), body(std::move(body))
+{
+}
+
+void WhileStmt::accept(Visitor& visitor)
+{
+	visitor.visitWhileStmt(static_pointer_cast<WhileStmt>(shared_from_this()));
 }

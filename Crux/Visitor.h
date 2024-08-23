@@ -15,6 +15,8 @@ class ExprStmt;
 class PrintStmt;
 class VarStmt;
 class BlockStmt;
+class IfStmt;
+class WhileStmt;
 
 
 class Visitor {
@@ -33,4 +35,6 @@ public:
 	virtual void visitPrintStmt(Ptr<PrintStmt>) = 0;
 	virtual void visitVarStmt(Ptr<VarStmt>) = 0;
 	virtual void visitBlockStmt(Ptr<BlockStmt>) = 0;
+	virtual void visitIfStmt(Ptr<IfStmt>) = 0;
+	virtual void visitWhileStmt(Ptr<WhileStmt>) = 0;
 };

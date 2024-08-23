@@ -22,6 +22,8 @@ private:
 	Ptr<Expr> unary();
 	Ptr<Expr> primary();
 	Ptr<Expr> assignment();
+	Ptr<Expr> logicalOr();
+	Ptr<Expr> logicalAnd();
 
 	Ptr<Stmt> statement();
 	Ptr<Stmt> printStatement();
@@ -29,6 +31,9 @@ private:
 	Ptr<Stmt> declaration();
 	Ptr<Stmt> varDeclaration();
 	std::vector<Ptr<Stmt>> block();
+	Ptr<Stmt> ifStatement();
+	Ptr<Stmt> whileStatement();
+	Ptr<Stmt> forStatement();
 
 
 	// Helper functions
