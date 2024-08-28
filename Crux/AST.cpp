@@ -56,8 +56,8 @@ void AssignExpr::accept(Visitor& visitor)
 	visitor.visitAssign(static_pointer_cast<AssignExpr>(shared_from_this()));
 }
 
-AssignExpr::AssignExpr(Ptr<Token> name, Ptr<Expr> value)
-	: name(std::move(name)), value(std::move(value))
+AssignExpr::AssignExpr(Ptr<Token> name, Ptr<Expr> value, int mode)
+	: name(std::move(name)), value(std::move(value)), mode(mode)
 {
 }
 

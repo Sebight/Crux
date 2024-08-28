@@ -65,8 +65,12 @@ class AssignExpr : public Expr {
 public:
 	Ptr<Token> name;
 	Ptr<Expr> value;
+	// 1 - =
+	// 2 - +=
+	// 3 - -=
+	int mode;
 
-	AssignExpr(Ptr<Token> name, Ptr<Expr> value);
+	AssignExpr(Ptr<Token> name, Ptr<Expr> value, int mode);
 	void accept(Visitor& visitor) override;
 };
 

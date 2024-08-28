@@ -50,6 +50,39 @@ void Interpreter::visitAssign(Ptr<AssignExpr> expr)
 	Ptr<CruxObject> value = m_results.top();
 	m_results.pop();
 
+	if (expr->mode == 1) {
+		m_env.assign(expr->name, value);
+		return;
+	}
+
+	Ptr<CruxObject> current = m_env.get(expr->name);
+	if (current == nullptr) {
+		throw CruxRuntimeError("Undefined variable '" + expr->name->lexeme + "'", expr->name->line, expr->name->lexeme);
+	}
+
+	if (expr->mode == 2) {
+		if (bTypeCheck(expr->name, current, TokenType::STRING) && bTypeCheck(expr->name, value, TokenType::STRING)) {
+			value->str = current->str + value->str;
+			m_env.assign(expr->name, value);
+			return;
+		}
+
+		typeCheck(expr->name, current, TokenType::NUMBER);
+		typeCheck(expr->name, value, TokenType::NUMBER);
+		value->num = current->num + value->num;
+	}
+
+	if (expr->mode == 3) {
+		if (bTypeCheck(expr->name, current, TokenType::STRING) && bTypeCheck(expr->name, value, TokenType::STRING)) {
+			throw CruxRuntimeError("Unsupported operator.", expr->name->line, expr->name->lexeme);
+			return;
+		}
+
+		typeCheck(expr->name, current, TokenType::NUMBER);
+		typeCheck(expr->name, value, TokenType::NUMBER);
+		value->num = current->num - value->num;
+	}
+
 	m_env.assign(expr->name, value);
 }
 

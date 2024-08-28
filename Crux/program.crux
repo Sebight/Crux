@@ -1,8 +1,9 @@
-fn compute(val) {
-	fn precomp(v) {
-		return v;
-	}
-	return precomp(val) * 2000 - 1000;
-}
+var s = "";
+s += "a";
+s += "a";
+print(s);
 
-print(compute(1));
+var i = 0;
+i += 1;
+i -= 1;
+print(i);

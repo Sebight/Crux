@@ -53,7 +53,7 @@ Ptr<Expr> Parser::term()
 {
 	Ptr<Expr> expr = factor();
 
-	while (match({ TokenType::MINUS, TokenType::PLUS })) {
+	while (match({ TokenType::MINUS, TokenType::PLUS})) {
 		Ptr<Token> op = previous();
 		Ptr<Expr> right = factor();
 		expr = std::make_shared<BinaryExpr>(expr, op, right);
@@ -113,15 +113,19 @@ Ptr<Expr> Parser::primary()
 Ptr<Expr> Parser::assignment()
 {
 	Ptr<Expr> expr = logicalOr();
+	int mode = -1;
 
-	if (match({ TokenType::EQUAL })) {
+	if (match({ TokenType::EQUAL })) mode = 1;
+	if (match({ TokenType::PLUS_EQUAL })) mode = 2;
+	if (match({ TokenType::MINUS_EQUAL })) mode = 3;
+
+	if (mode != -1) {
 		Ptr<Token> equals = previous();
 		Ptr<Expr> value = assignment();
 
 		try {
 			VariableExpr& var = dynamic_cast<VariableExpr&>(*expr);
-			// Ptr<Token> name = std::make_shared<Token>(var.name->type, var.name->lexeme, var.name->literal, var.name->line);
-			return std::make_shared<AssignExpr>(var.name, value);
+			return std::make_shared<AssignExpr>(var.name, value, mode);
 		}
 		catch (const std::bad_cast& e) {
 			throw ParseError("Invalid assignment target.", equals->line);

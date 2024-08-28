@@ -75,6 +75,10 @@ private:
 		}
 	}
 
+	bool bTypeCheck(Ptr<Token>&, Ptr<CruxObject>& obj, TokenType target) {
+		return obj->type == target;
+	}
+
 	void assert(bool condition, std::string message) {
 		if (!condition) {
 			throw CruxRuntimeError(message);
