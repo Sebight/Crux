@@ -14,14 +14,7 @@ std::string getLiteralString(const Literal& value)
 
 OptLiteral makeOptLiteral(const std::string& value)
 {
-	if (value.empty())
-	{
-		return std::nullopt;
-	}
-	else
-	{
-		return Literal(value);
-	}
+	return Literal(value);
 }
 
 OptLiteral makeOptLiteral(double value)
