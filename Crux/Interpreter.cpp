@@ -41,7 +41,6 @@ void Interpreter::visitVariable(Ptr<VariableExpr> expr)
 	if (value == nullptr) {
 		throw CruxRuntimeError("Undefined variable '" + expr->name->lexeme + "'", expr->name->line, expr->name->lexeme);
 	}
-
 	m_results.push(value);
 }
 
@@ -72,6 +71,32 @@ void Interpreter::visitLogical(Ptr<LogicalExpr> expr)
 	}
 
 	eval(expr->right);
+}
+
+void Interpreter::visitCall(Ptr<CallExpr> expr)
+{
+	eval(expr->callee);
+	Ptr<CruxObject> callee = m_results.top();
+	m_results.pop();
+
+	std::vector<Ptr<CruxObject>> args;
+	for (Ptr<Expr> arg : expr->arguments) {
+		eval(arg);
+		args.push_back(m_results.top());
+		m_results.pop();
+	}
+
+	Ptr<CruxCallable> function = std::dynamic_pointer_cast<CruxCallable>(callee);
+	if (function == nullptr) {
+		throw CruxRuntimeError("Can only call functions and classes", expr->paren->line, expr->paren->lexeme);
+	}
+
+	if (expr->arguments.size() != function->arity()) {
+		throw CruxRuntimeError("Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(expr->arguments.size()), expr->paren->line, expr->paren->lexeme);
+	}
+
+	Ptr<CruxObject> obj = function->call(std::make_shared<Interpreter>(m_env, m_globals), args);
+	m_results.push(obj);
 }
 
 void Interpreter::visitUnary(Ptr<UnaryExpr> unary) {
@@ -213,7 +238,7 @@ void Interpreter::interpret(std::vector<Ptr<Stmt>> statements)
 	}
 	catch (const std::exception& e) {
 		// TODO: Proper handling for runtime errors
-		printf("Error: %s\n", e.what());
+		printf("Runtime Error: %s\n", e.what());
 	}
 }
 
@@ -231,8 +256,12 @@ void Interpreter::executeBlock(std::vector<Ptr<Stmt>> statements, Env& env)
 			execute(stmt);
 		}
 	}
-	catch (const std::exception& e) {
+	catch (const CruxReturn& e) {
 		throw e;
+	}
+	catch (const std::exception& e) {
+		// TODO: Look into this, might not be the best solution but was a fix
+		throw CruxRuntimeError(e.what());
 	}
 	m_env = prev;
 }
@@ -333,4 +362,19 @@ void Interpreter::visitWhileStmt(Ptr<WhileStmt> stmt)
 		cond = m_results.top();
 		m_results.pop();
 	}
+}
+
+void Interpreter::visitFunctionStmt(Ptr<FunctionStmt> stmt)
+{
+	Ptr<CruxFunction> func = std::make_shared<CruxFunction>(stmt, std::make_shared<Env>(m_env));
+	m_env.define(stmt->name->lexeme, func);
+}
+
+void Interpreter::visitReturnStmt(Ptr<ReturnStmt> stmt)
+{
+	if (stmt->value != nullptr) {
+		eval(stmt->value);
+	}
+
+	throw CruxReturn(m_results.top());
 }

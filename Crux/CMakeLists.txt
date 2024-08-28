@@ -12,7 +12,7 @@ endif()
 project ("Crux")
 
 # Add source to this project's executable.
-add_executable (Crux "Crux.cpp" "Crux.h" "Scanner.cpp" "Scanner.h" "Token.h" "Literal.h" "Literal.cpp" "AST.h"  "Visitor.h" "AST.cpp" "ASTPrinter.h" "ASTPrinter.cpp" "Parser.h" "Parser.cpp" "Types.h" "Interpreter.h" "Interpreter.cpp" "CruxObject.h" "CruxObject.cpp" "Env.h")
+add_executable (Crux "Crux.cpp" "Crux.h" "Scanner.cpp" "Scanner.h" "Token.h" "Literal.h" "Literal.cpp" "AST.h"  "Visitor.h" "AST.cpp" "ASTPrinter.h" "ASTPrinter.cpp" "Parser.h" "Parser.cpp" "Types.h" "Interpreter.h" "Interpreter.cpp" "CruxObject.h" "CruxObject.cpp" "Env.h" "CruxCallable.h" "CruxNative/NativeClock.h" "CruxNative/NativeClock.cpp" "CruxFunction.h" "CruxFunction.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Crux PROPERTY CXX_STANDARD 20)

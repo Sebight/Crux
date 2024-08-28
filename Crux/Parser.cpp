@@ -82,7 +82,7 @@ Ptr<Expr> Parser::unary()
 		Ptr<Expr> right = unary();
 		return std::make_shared<UnaryExpr>(op, right);
 	}
-	return primary();
+	return call();
 }
 
 Ptr<Expr> Parser::primary()
@@ -157,11 +157,46 @@ Ptr<Expr> Parser::logicalAnd()
 	return expr;
 }
 
+Ptr<Expr> Parser::call()
+{
+	Ptr<Expr> expr = primary();
+
+	while (true) {
+		if (match({ TokenType::LEFT_PAREN })) {
+			expr = finishCall(expr);
+		}
+		else {
+			break;
+		}
+	}
+
+	return expr;
+}
+
+Ptr<Expr> Parser::finishCall(Ptr<Expr> callee)
+{
+	std::vector<Ptr<Expr>> arguments;
+
+	if (!check({ TokenType::RIGHT_PAREN })) {
+		do {
+			if (arguments.size() >= 127) {
+				throw ParseError("Cannot have more than 127 arguments.", peek()->line);
+			}
+
+			arguments.push_back(expression());
+		} while (match({ TokenType::COMMA }));
+	}
+
+	Ptr<Token> paren = consume(TokenType::RIGHT_PAREN, "Expected ')' after arguments.");
+	return std::make_shared<CallExpr>(callee, paren, arguments);
+}
+
 Ptr<Stmt> Parser::statement()
 {
 	if (match({ TokenType::FOR })) return forStatement();
 	if (match({ TokenType::IF })) return ifStatement();
 	if (match({ TokenType::PRINT })) return printStatement();
+	if (match({ TokenType::RETURN })) return returnStatement();
 	if (match({ TokenType::WHILE })) return whileStatement();
 	if (match({ TokenType::LEFT_BRACE })) return std::make_shared<BlockStmt>(block());
 
@@ -185,6 +220,7 @@ Ptr<Stmt> Parser::expressionStatement()
 Ptr<Stmt> Parser::declaration()
 {
 	try {
+		if (match({ TokenType::FUNC })) return function("function");
 		if (match({ TokenType::VAR })) return varDeclaration();
 		return statement();
 	}
@@ -290,6 +326,42 @@ Ptr<Stmt> Parser::forStatement()
 	return body;
 }
 
+Ptr<FunctionStmt> Parser::function(std::string kind)
+{
+	Ptr<Token> name = consume(TokenType::IDENTIFIER, "Expected " + kind + " name.");
+	consume(TokenType::LEFT_PAREN, "Expected '(' after " + kind + " name.");
+
+	std::vector<Ptr<Token>> parameters;
+	if (!check(TokenType::RIGHT_PAREN)) {
+		do {
+			if (parameters.size() >= 127) {
+				throw ParseError("Cannot have more than 127 parameters.", peek()->line);
+			}
+
+			parameters.push_back(consume(TokenType::IDENTIFIER, "Expected parameter name."));
+		} while (match({ TokenType::COMMA }));
+	}
+
+	consume(TokenType::RIGHT_PAREN, "Expected ')' after parameters.");
+
+	consume(TokenType::LEFT_BRACE, "Expected '{' before " + kind + " body.");
+	std::vector<Ptr<Stmt>> body = block();
+	return std::make_shared<FunctionStmt>(name, parameters, body);
+}
+
+Ptr<Stmt> Parser::returnStatement()
+{
+	Ptr<Token> keyword = previous();
+	Ptr<Expr> value = nullptr;
+
+	if (!check(TokenType::SEMICOLON)) {
+		value = expression();
+	}
+
+	consume(TokenType::SEMICOLON, "Expected ';' after return value.");
+	return std::make_shared<ReturnStmt>(keyword, value);
+}
+
 void Parser::synchronize() {
 	advance();
 
@@ -298,7 +370,7 @@ void Parser::synchronize() {
 
 		switch (peek()->type) {
 		case TokenType::CLASS:
-		case TokenType::FUN:
+		case TokenType::FUNC:
 		case TokenType::VAR:
 		case TokenType::FOR:
 		case TokenType::IF:

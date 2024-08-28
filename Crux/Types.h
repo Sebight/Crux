@@ -2,8 +2,11 @@
 #include <memory>
 #include <string>
 
+
 template<typename T>
 using Ptr = std::shared_ptr<T>;
+
+class CruxObject;
 
 class CruxRuntimeError : public std::exception {
 public:
@@ -21,6 +24,14 @@ public:
 
 private:
 	std::string m_message;
+};
+
+// TODO: Look into optimizing stack trace overhead, etc.
+class CruxReturn : public std::exception {
+public:
+	Ptr<CruxObject> value;
+
+	CruxReturn(Ptr<CruxObject> value) : value(value) { }
 };
 
 class ParseError : public std::exception {

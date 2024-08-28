@@ -130,3 +130,30 @@ void WhileStmt::accept(Visitor& visitor)
 {
 	visitor.visitWhileStmt(static_pointer_cast<WhileStmt>(shared_from_this()));
 }
+
+CallExpr::CallExpr(Ptr<Expr> callee, Ptr<Token> paren, std::vector<Ptr<Expr>> arguments) : callee(std::move(callee)), paren(std::move(paren)), arguments(std::move(arguments))
+{
+}
+
+void CallExpr::accept(Visitor& visitor)
+{
+	visitor.visitCall(static_pointer_cast<CallExpr>(shared_from_this()));
+}
+
+FunctionStmt::FunctionStmt(Ptr<Token> name, std::vector<Ptr<Token>> params, std::vector<Ptr<Stmt>> body) : name(std::move(name)), params(std::move(params)), body(std::move(body))
+{
+}
+
+void FunctionStmt::accept(Visitor& visitor)
+{
+	visitor.visitFunctionStmt(static_pointer_cast<FunctionStmt>(shared_from_this()));
+}
+
+ReturnStmt::ReturnStmt(Ptr<Token> keyword, Ptr<Expr> value) : keyword(std::move(keyword)), value(std::move(value))
+{
+}
+
+void ReturnStmt::accept(Visitor& visitor)
+{
+	visitor.visitReturnStmt(static_pointer_cast<ReturnStmt>(shared_from_this()));
+}

@@ -3,6 +3,8 @@
 #include <string>
 #include "Token.h"
 #include <memory>
+#include "Types.h"
+#include <vector>
 
 class CruxObject : std::enable_shared_from_this<CruxObject> {
 public:
@@ -18,6 +20,6 @@ public:
 	CruxObject(double num);
 	CruxObject(bool boolean);
 
-	std::string toString();
+	virtual std::string toString();
 };
 

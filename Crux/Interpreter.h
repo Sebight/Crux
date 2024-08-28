@@ -4,13 +4,28 @@
 #include "Types.h"
 #include "AST.h"
 #include <stack>
-#include "CruxObject.h"
 #include "Literal.h"
 #include "Env.h"
 
+// Runtime objects
+#include "CruxNative/NativeClock.h"
+#include "CruxObject.h"
+#include "CruxCallable.h"
+#include "CruxFunction.h"
+
 class Interpreter : public Visitor {
 public:
-	Interpreter() = default;
+	Interpreter() {
+		m_globals.define("clock", std::make_shared<NativeClock>());
+
+		m_env = m_globals;
+	}
+
+	Interpreter(Env env, Env globals) {
+		m_env = env;
+		m_globals = globals;
+	}
+
 	~Interpreter() = default;
 
 	void visitBinary(Ptr<BinaryExpr> expr) override;
@@ -22,19 +37,32 @@ public:
 	void visitAssign(Ptr<AssignExpr> expr) override;
 	void visitLogical(Ptr<LogicalExpr> expr) override;
 
+	void visitCall(Ptr<CallExpr> expr) override;
+
 	void visitExprStmt(Ptr<ExprStmt> stmt) override;
 	void visitPrintStmt(Ptr<PrintStmt> stmt) override;
 	void visitVarStmt(Ptr<VarStmt> stmt) override;
 	void visitBlockStmt(Ptr<BlockStmt> stmt) override;
 	void visitIfStmt(Ptr<IfStmt> stmt) override;
 	void visitWhileStmt(Ptr<WhileStmt> stmt) override;
+	void visitFunctionStmt(Ptr<FunctionStmt> stmt) override;
+	void visitReturnStmt(Ptr<ReturnStmt> stmt) override;
 
 	void interpret(std::vector<Ptr<Stmt>> statements);
 	void execute(Ptr<Stmt> stmt);
 	void executeBlock(std::vector<Ptr<Stmt>> statements, Env& env);
+
+	void pushResult(Ptr<CruxObject> obj) {
+		m_results.push(std::move(obj));
+	}
+
+	Ptr<Env> getEnv() {
+		return std::make_shared<Env>(m_env);
+	}
 private:
 	std::stack<Ptr<CruxObject>> m_results;
 	Env m_env;
+	Env m_globals;
 
 	void eval(Ptr<Expr> expr);
 	bool isTruthy(Ptr<CruxObject> obj);

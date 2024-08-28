@@ -24,6 +24,8 @@ private:
 	Ptr<Expr> assignment();
 	Ptr<Expr> logicalOr();
 	Ptr<Expr> logicalAnd();
+	Ptr<Expr> call();
+	Ptr<Expr> finishCall(Ptr<Expr> callee);
 
 	Ptr<Stmt> statement();
 	Ptr<Stmt> printStatement();
@@ -34,6 +36,8 @@ private:
 	Ptr<Stmt> ifStatement();
 	Ptr<Stmt> whileStatement();
 	Ptr<Stmt> forStatement();
+	Ptr<FunctionStmt> function(std::string kind);
+	Ptr<Stmt> returnStatement();
 
 
 	// Helper functions

@@ -79,6 +79,15 @@ public:
 	LogicalExpr(Ptr<Expr> left, Ptr<Token> op, Ptr<Expr> right);
 	void accept(Visitor& visitor) override;
 };
+class CallExpr : public Expr {
+public:
+	Ptr<Expr> callee;
+	Ptr<Token> paren;
+	std::vector<Ptr<Expr>> arguments;
+
+	CallExpr(Ptr<Expr> callee, Ptr<Token> paren, std::vector<Ptr<Expr>> arguments);
+	void accept(Visitor& visitor) override;
+};
 
 class Stmt : public ASTNode, public std::enable_shared_from_this<Stmt> {
 public:
@@ -135,5 +144,24 @@ public:
 	Ptr<Stmt> body;
 
 	WhileStmt(Ptr<Expr> cond, Ptr<Stmt> body);
+	void accept(Visitor& visitor) override;
+};
+
+class FunctionStmt : public Stmt {
+public:
+	Ptr<Token> name;
+	std::vector<Ptr<Token>> params;
+	std::vector<Ptr<Stmt>> body;
+
+	FunctionStmt(Ptr<Token> name, std::vector<Ptr<Token>> params, std::vector<Ptr<Stmt>> body);
+	void accept(Visitor& visitor) override;
+};
+
+class ReturnStmt : public Stmt {
+public:
+	Ptr<Token> keyword;
+	Ptr<Expr> value;
+
+	ReturnStmt(Ptr<Token> keyword, Ptr<Expr> value);
 	void accept(Visitor& visitor) override;
 };

@@ -64,8 +64,6 @@ void Crux::run(const std::string& source)
 
 	Interpreter interpreter = Interpreter();
 	interpreter.interpret(statements);
-
-	// TODO: Runtime 
 }
 
 void Crux::error(int line, const std::string& message)

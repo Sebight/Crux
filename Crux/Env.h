@@ -8,7 +8,7 @@
 class Env {
 public:
 	Env() = default;
-	Env(Ptr<Env> enclosing) : m_enclosing(enclosing) {}
+	Env(Ptr<Env> enclosing) : m_enclosing(enclosing) { }
 	~Env() = default;
 
 	void define(std::string name, Ptr<CruxObject> value) {
@@ -39,11 +39,11 @@ public:
 		if (m_enclosing != nullptr) {
 			return m_enclosing->get(name);
 		}
-
+		
 		throw CruxRuntimeError("Undefined variable: " + name->lexeme + ".", name->line, name->lexeme);
 	}
 
-	void dump() {
+	void dump(bool rec = false) {
 		std::string content;
 		size_t index = 0;
 		std::string level = "NESTED";
@@ -55,7 +55,11 @@ public:
 			content += level + " - " + "[" + std::to_string(index) + "] " + key + " => " + value->toString() + "\n";
 			index++;
 		}
+
 		printf("%s", content.c_str());
+		if (rec && m_enclosing != nullptr) {
+			m_enclosing->dump(true);
+		}
 	}
 private:
 	std::unordered_map<std::string, Ptr<CruxObject>> m_values;
