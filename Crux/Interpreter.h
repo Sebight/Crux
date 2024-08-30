@@ -16,12 +16,13 @@
 class Interpreter : public Visitor {
 public:
 	Interpreter() {
-		m_globals.define("clock", std::make_shared<NativeClock>());
+		m_globals = std::make_shared<Env>();
+		m_globals->define("clock", std::make_shared<NativeClock>());
 
 		m_env = m_globals;
 	}
 
-	Interpreter(Env env, Env globals) {
+	Interpreter(Ptr<Env> env, Ptr<Env> globals) {
 		m_env = env;
 		m_globals = globals;
 	}
@@ -50,7 +51,7 @@ public:
 
 	void interpret(std::vector<Ptr<Stmt>> statements);
 	void execute(Ptr<Stmt> stmt);
-	void executeBlock(std::vector<Ptr<Stmt>> statements, Env& env);
+	void executeBlock(std::vector<Ptr<Stmt>> statements, Ptr<Env> env);
 
 	void pushResult(Ptr<CruxObject> obj) {
 		m_results.push(std::move(obj));
@@ -61,8 +62,8 @@ public:
 	}
 private:
 	std::stack<Ptr<CruxObject>> m_results;
-	Env m_env;
-	Env m_globals;
+	Ptr<Env> m_env;
+	Ptr<Env> m_globals;
 
 	void eval(Ptr<Expr> expr);
 	bool isTruthy(Ptr<CruxObject> obj);

@@ -37,7 +37,7 @@ void Interpreter::visitGrouping(Ptr<GroupingExpr> group)
 
 void Interpreter::visitVariable(Ptr<VariableExpr> expr)
 {
-	Ptr<CruxObject> value = m_env.get(expr->name);
+	Ptr<CruxObject> value = m_env->get(expr->name);
 	if (value == nullptr) {
 		throw CruxRuntimeError("Undefined variable '" + expr->name->lexeme + "'", expr->name->line, expr->name->lexeme);
 	}
@@ -51,11 +51,11 @@ void Interpreter::visitAssign(Ptr<AssignExpr> expr)
 	m_results.pop();
 
 	if (expr->mode == 1) {
-		m_env.assign(expr->name, value);
+		m_env->assign(expr->name, value);
 		return;
 	}
 
-	Ptr<CruxObject> current = m_env.get(expr->name);
+	Ptr<CruxObject> current = m_env->get(expr->name);
 	if (current == nullptr) {
 		throw CruxRuntimeError("Undefined variable '" + expr->name->lexeme + "'", expr->name->line, expr->name->lexeme);
 	}
@@ -63,7 +63,7 @@ void Interpreter::visitAssign(Ptr<AssignExpr> expr)
 	if (expr->mode == 2) {
 		if (bTypeCheck(expr->name, current, TokenType::STRING) && bTypeCheck(expr->name, value, TokenType::STRING)) {
 			value->str = current->str + value->str;
-			m_env.assign(expr->name, value);
+			m_env->assign(expr->name, value);
 			return;
 		}
 
@@ -83,7 +83,7 @@ void Interpreter::visitAssign(Ptr<AssignExpr> expr)
 		value->num = current->num - value->num;
 	}
 
-	m_env.assign(expr->name, value);
+	m_env->assign(expr->name, value);
 }
 
 void Interpreter::visitLogical(Ptr<LogicalExpr> expr)
@@ -280,9 +280,9 @@ void Interpreter::execute(Ptr<Stmt> stmt)
 	stmt->accept(*this);
 }
 
-void Interpreter::executeBlock(std::vector<Ptr<Stmt>> statements, Env& env)
+void Interpreter::executeBlock(std::vector<Ptr<Stmt>> statements, Ptr<Env> env)
 {
-	Env& prev = m_env;
+	Ptr<Env> prev = m_env;
 	try {
 		m_env = env;
 		for (Ptr<Stmt> stmt : statements) {
@@ -359,12 +359,12 @@ void Interpreter::visitVarStmt(Ptr<VarStmt> stmt)
 		m_results.pop();
 	}
 
-	m_env.define(stmt->name->lexeme, value);
+	m_env->define(stmt->name->lexeme, value);
 }
 
 void Interpreter::visitBlockStmt(Ptr<BlockStmt> stmt)
 {
-	Env newEnv = Env(std::make_shared<Env>(m_env));
+	Ptr<Env> newEnv = std::make_shared<Env>(m_env);
 	executeBlock(stmt->statements, newEnv);
 }
 
@@ -399,8 +399,8 @@ void Interpreter::visitWhileStmt(Ptr<WhileStmt> stmt)
 
 void Interpreter::visitFunctionStmt(Ptr<FunctionStmt> stmt)
 {
-	Ptr<CruxFunction> func = std::make_shared<CruxFunction>(stmt, std::make_shared<Env>(m_env));
-	m_env.define(stmt->name->lexeme, func);
+	Ptr<CruxFunction> func = std::make_shared<CruxFunction>(stmt, m_env);
+	m_env->define(stmt->name->lexeme, func);
 }
 
 void Interpreter::visitReturnStmt(Ptr<ReturnStmt> stmt)
