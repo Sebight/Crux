@@ -4,6 +4,7 @@
 #include "Scanner.h"
 #include "Parser.h"
 #include "Interpreter.h"
+#include "Resolver.h"
 
 bool Crux::hadError = false;
 
@@ -63,6 +64,13 @@ void Crux::run(const std::string& source)
 	//if (hadError) return;
 
 	Interpreter interpreter = Interpreter();
+	Resolver resolver = Resolver(&interpreter);
+
+	resolver.resolve(statements);
+
+	// TODO: Errors
+	//if (hadError) return;
+
 	interpreter.interpret(statements);
 }
 

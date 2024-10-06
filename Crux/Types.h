@@ -26,6 +26,24 @@ private:
 	std::string m_message;
 };
 
+class CruxResolverError : public std::exception {
+public:
+	CruxResolverError(std::string message, int line = -1, std::string token = "") : m_message(message) {
+		if (line != -1 && !token.empty()) {
+			m_message = "Line " + std::to_string(line) + ": " + message + " at token: " + token;
+		}
+		else {
+			m_message = message;
+		}
+	}
+	const char* what() const noexcept override {
+		return m_message.c_str();
+	}
+
+private:
+	std::string m_message;
+};
+
 // TODO: Look into optimizing stack trace overhead, etc.
 class CruxReturn : public std::exception {
 public:

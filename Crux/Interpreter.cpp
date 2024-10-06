@@ -83,7 +83,13 @@ void Interpreter::visitAssign(Ptr<AssignExpr> expr)
 		value->num = current->num - value->num;
 	}
 
-	m_env->assign(expr->name, value);
+	int dist = m_locals.find(expr) != m_locals.end() ? m_locals[expr] : -1;
+	if (dist != -1) {
+		m_env->assignAt(dist, expr->name, value);
+		return;
+	}
+
+	m_globals->assign(expr->name, value);
 }
 
 void Interpreter::visitLogical(Ptr<LogicalExpr> expr)
@@ -297,6 +303,23 @@ void Interpreter::executeBlock(std::vector<Ptr<Stmt>> statements, Ptr<Env> env)
 		throw CruxRuntimeError(e.what());
 	}
 	m_env = prev;
+}
+
+void Interpreter::resolve(Ptr<Expr> expr, int depth)
+{
+	m_locals[expr] = depth;
+}
+
+Ptr<CruxObject> Interpreter::lookUpVariable(Ptr<Token> name, Ptr<Expr> expr)
+{
+	int dist = m_locals.find(expr) != m_locals.end() ? m_locals[expr] : -1;
+
+	if (dist != -1) {
+		return m_env->getAt(dist, name->lexeme);
+	}
+	else {
+		return m_globals->get(name);
+	}
 }
 
 void Interpreter::eval(Ptr<Expr> expr)

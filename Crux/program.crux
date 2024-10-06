@@ -1,9 +1,0 @@
-var s = "";
-s += "a";
-s += "a";
-print(s);
-
-var i = 0;
-i += 1;
-i -= 1;
-print(i);

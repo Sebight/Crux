@@ -30,6 +30,10 @@ public:
 		throw CruxRuntimeError("Undefined variable: " + name->lexeme + ".", name->line, name->lexeme);
 	}
 
+	void assignAt(int distance, Ptr<Token> name, Ptr<CruxObject> value) {
+		ancestor(distance)->m_values[name->lexeme] = value;
+	}
+
 	Ptr<CruxObject> get(Ptr<Token> name) {
 		auto it = m_values.find(name->lexeme);
 		if (it != m_values.end()) {
@@ -41,6 +45,20 @@ public:
 		}
 		
 		throw CruxRuntimeError("Undefined variable: " + name->lexeme + ".", name->line, name->lexeme);
+	}
+
+	Ptr<CruxObject> getAt(int distance, std::string name) {
+		Ptr<Env> env = ancestor(distance);
+		return env->m_values[name];
+	}
+
+	Ptr<Env> ancestor(int distance) {
+		Ptr<Env> env = m_enclosing;
+		for (int i = 0; i < distance; i++) {
+			env = env->m_enclosing;
+		}
+
+		return env;
 	}
 
 	void dump(bool rec = false) {

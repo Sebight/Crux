@@ -60,10 +60,15 @@ public:
 	Ptr<Env> getEnv() {
 		return std::make_shared<Env>(m_env);
 	}
+
+	void resolve(Ptr<Expr>, int depth);
 private:
 	std::stack<Ptr<CruxObject>> m_results;
 	Ptr<Env> m_env;
 	Ptr<Env> m_globals;
+	std::unordered_map<Ptr<Expr>, int> m_locals;
+
+	Ptr<CruxObject> lookUpVariable(Ptr<Token> name, Ptr<Expr> expr);
 
 	void eval(Ptr<Expr> expr);
 	bool isTruthy(Ptr<CruxObject> obj);
