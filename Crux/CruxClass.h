@@ -10,9 +10,7 @@ public:
 		return m_name;
 	}
 
-	int arity() override {
-		return 0;
-	}
+	int arity() override;
 
 	std::string getName() {
 		return m_name;

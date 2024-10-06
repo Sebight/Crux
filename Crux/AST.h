@@ -104,11 +104,17 @@ public:
 
 class SetExpr : public Expr {
 public:
+	enum SetOperation {
+		ASSIGN = 1,
+		PLUS_ASSIGN = 2,
+		MINUS_ASSIGN = 3
+	};
 	Ptr<Expr> object;
 	Ptr<Token> name;
 	Ptr<Expr> value;
+	SetOperation operation;
 
-	SetExpr(Ptr<Expr> object, Ptr<Token> name, Ptr<Expr> value);
+	SetExpr(Ptr<Expr> object, Ptr<Token> name, Ptr<Expr> value, int operation);
 	void accept(Visitor& visitor) override;
 };
 

@@ -27,5 +27,5 @@ Ptr<CruxFunction> CruxFunction::bind(Ptr<CruxInstance> instance)
 {
 	Ptr<Env> env = std::make_shared<Env>(m_closure);
 	env->define("this", instance);
-	return std::make_shared<CruxFunction>(m_declaration, env);
+	return std::make_shared<CruxFunction>(m_declaration, env, m_isConstructor);
 }

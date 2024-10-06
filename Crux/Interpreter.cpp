@@ -168,7 +168,46 @@ void Interpreter::visitSet(Ptr<SetExpr> expr)
 	Ptr<CruxObject> value = m_results.top();
 	m_results.pop();
 
-	instance->set(expr->name, value);
+	Ptr<CruxObject> current = nullptr;
+
+	// If the field is yet to be defined, we can just set it.
+	try {
+		current = instance->get(expr->name);
+	}
+	catch (const CruxRuntimeError& e) {
+		instance->set(expr->name, value);
+		return;
+	}
+
+	if (current == nullptr) return;
+
+	if (expr->operation == SetExpr::SetOperation::ASSIGN) {
+		instance->set(expr->name, value);
+	}
+	else if (expr->operation == SetExpr::SetOperation::PLUS_ASSIGN) {
+		if (bTypeCheck(expr->name, value, TokenType::STRING)) {
+			value->str = instance->get(expr->name)->str + value->str;
+			instance->set(expr->name, value);
+			return;
+		}
+
+		typeCheck(expr->name, current, TokenType::NUMBER);
+		typeCheck(expr->name, value, TokenType::NUMBER);
+
+		value->num = instance->get(expr->name)->num + value->num;
+		instance->set(expr->name, value);
+	} else if (expr->operation == SetExpr::SetOperation::MINUS_ASSIGN) {
+		if (bTypeCheck(expr->name, value, TokenType::STRING)) {
+			throw CruxRuntimeError("Unsupported operator.", expr->name->line, expr->name->lexeme);
+			return;
+		}
+
+		typeCheck(expr->name, current, TokenType::NUMBER);
+		typeCheck(expr->name, value, TokenType::NUMBER);
+
+		value->num = instance->get(expr->name)->num - value->num;
+		instance->set(expr->name, value);
+	}
 }
 
 void Interpreter::visitThis(Ptr<ThisExpr> expr)
@@ -462,7 +501,7 @@ void Interpreter::visitWhileStmt(Ptr<WhileStmt> stmt)
 
 void Interpreter::visitFunctionStmt(Ptr<FunctionStmt> stmt)
 {
-	Ptr<CruxFunction> func = std::make_shared<CruxFunction>(stmt, m_env);
+	Ptr<CruxFunction> func = std::make_shared<CruxFunction>(stmt, m_env, false);
 	m_env->define(stmt->name->lexeme, func);
 }
 
@@ -470,6 +509,10 @@ void Interpreter::visitReturnStmt(Ptr<ReturnStmt> stmt)
 {
 	if (stmt->value != nullptr) {
 		eval(stmt->value);
+	}
+	else {
+		// Push nil to the stack
+		m_results.push(std::make_shared<CruxObject>());
 	}
 
 	throw CruxReturn(m_results.top());
@@ -480,9 +523,8 @@ void Interpreter::visitClassStmt(Ptr<ClassStmt> stmt)
 	m_env->define(stmt->name->lexeme, nullptr);
 
 	std::map<std::string, Ptr<CruxFunction>> methods;
-
 	for (Ptr<FunctionStmt>& method : stmt->methods) {
-		Ptr<CruxFunction> function = std::make_shared<CruxFunction>(method, m_env);
+		Ptr<CruxFunction> function = std::make_shared<CruxFunction>(method, m_env, method->name->lexeme == stmt->name->lexeme);
 		methods[method->name->lexeme] = function;
 	}
 

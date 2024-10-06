@@ -5,7 +5,8 @@
 enum class FunctionType {
 	None,
 	Function,
-	Method
+	Method,
+	Constructor
 };
 
 enum class ClassType {

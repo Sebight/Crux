@@ -132,19 +132,11 @@ Ptr<Expr> Parser::assignment()
 			return std::make_shared<AssignExpr>(var->name, value, mode);
 		}
 		else if (get != nullptr) {
-			return std::make_shared<SetExpr>(get->object, get->name, value);
+			return std::make_shared<SetExpr>(get->object, get->name, value, mode);
 		}
 		else {
 			throw ParseError("Invalid assignment target.", equals->line);
 		}
-
-		/*try {
-			VariableExpr& var = dynamic_cast<VariableExpr&>(*expr);
-			return std::make_shared<AssignExpr>(var.name, value, mode);
-		}
-		catch (const std::bad_cast& e) {
-			throw ParseError("Invalid assignment target.", equals->line);
-		}*/
 	}
 
 	return expr;

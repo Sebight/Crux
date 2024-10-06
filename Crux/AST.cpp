@@ -180,11 +180,12 @@ void GetExpr::accept(Visitor& visitor)
 	visitor.visitGet(static_pointer_cast<GetExpr>(shared_from_this()));
 }
 
-SetExpr::SetExpr(Ptr<Expr> object, Ptr<Token> name, Ptr<Expr> value)
+SetExpr::SetExpr(Ptr<Expr> object, Ptr<Token> name, Ptr<Expr> value, int operation)
 {
 	this->object = std::move(object);
 	this->name = std::move(name);
 	this->value = std::move(value);
+	this->operation = static_cast<SetOperation>(operation);
 }
 
 void SetExpr::accept(Visitor& visitor)

@@ -60,6 +60,11 @@ void Resolver::visitReturnStmt(Ptr<ReturnStmt> stmt)
 		throw CruxResolverError("Cannot return from top-level code.");
 	}
 
+	// TODO: Could support early returns in constructors, but feels unnecessary
+	if (m_currentFunction == FunctionType::Constructor) {
+		throw CruxResolverError("Cannot return a value from a constructor.");
+	}
+
 	if (stmt->value != nullptr)
 	{
 		resolve(stmt->value);
@@ -77,6 +82,11 @@ void Resolver::visitClassStmt(Ptr<ClassStmt> stmt)
 
 	for (Ptr<FunctionStmt>& method : stmt->methods) {
 		FunctionType decl = FunctionType::Method;
+
+		if (method->name->lexeme == stmt->name->lexeme) {
+			decl = FunctionType::Constructor;
+		}
+
 		resolveFunction(method, decl);
 	}
 	endScope();
@@ -93,7 +103,8 @@ void Resolver::resolve(std::vector<Ptr<Stmt>> statements)
 		{
 			resolve(stmt);
 		}
-	} catch (CruxResolverError& e) {
+	}
+	catch (CruxResolverError& e) {
 		printf("Resolve Error: %s\n", e.what());
 	}
 }

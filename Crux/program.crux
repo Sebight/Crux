@@ -1,8 +1,26 @@
-class MyClass {
-	f() {
-		print(this);
+class Counter {
+	Counter(initialValue) {
+		this.value = initialValue;
+	}
+
+	Add() {
+		this.value += 1;
+	}
+
+	Subtract() {
+		this.value -= 1;
+	}
+
+	Get() {
+		return this.value;
 	}
 }
 
-// MyClass().f();
-print(this);
+var counter = Counter(0);
+
+counter.Add();
+counter.Add();
+counter.Add();
+counter.Subtract();
+
+print(counter.Get());
