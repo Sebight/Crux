@@ -93,6 +93,33 @@ public:
 	void accept(Visitor& visitor) override;
 };
 
+class GetExpr : public Expr {
+public:
+	Ptr<Expr> object;
+	Ptr<Token> name;
+
+	GetExpr(Ptr<Expr> object, Ptr<Token> name);
+	void accept(Visitor& visitor) override;
+};
+
+class SetExpr : public Expr {
+public:
+	Ptr<Expr> object;
+	Ptr<Token> name;
+	Ptr<Expr> value;
+
+	SetExpr(Ptr<Expr> object, Ptr<Token> name, Ptr<Expr> value);
+	void accept(Visitor& visitor) override;
+};
+
+class ThisExpr : public Expr {
+public:
+	Ptr<Token> keyword;
+
+	ThisExpr(Ptr<Token> keyword);
+	void accept(Visitor& visitor) override;
+};
+
 class Stmt : public ASTNode, public std::enable_shared_from_this<Stmt> {
 public:
 	Stmt() = default;
@@ -167,5 +194,14 @@ public:
 	Ptr<Expr> value;
 
 	ReturnStmt(Ptr<Token> keyword, Ptr<Expr> value);
+	void accept(Visitor& visitor) override;
+};
+
+class ClassStmt : public Stmt {
+public:
+	Ptr<Token> name;
+	std::vector<Ptr<FunctionStmt>> methods;
+
+	ClassStmt(Ptr<Token> name, std::vector<Ptr<FunctionStmt>> methods);
 	void accept(Visitor& visitor) override;
 };

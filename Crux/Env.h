@@ -43,7 +43,7 @@ public:
 		if (m_enclosing != nullptr) {
 			return m_enclosing->get(name);
 		}
-		
+
 		throw CruxRuntimeError("Undefined variable: " + name->lexeme + ".", name->line, name->lexeme);
 	}
 

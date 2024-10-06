@@ -38,6 +38,7 @@ private:
 	Ptr<Stmt> forStatement();
 	Ptr<FunctionStmt> function(std::string kind);
 	Ptr<Stmt> returnStatement();
+	Ptr<ClassStmt> classDeclaration();
 
 
 	// Helper functions

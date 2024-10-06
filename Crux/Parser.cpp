@@ -53,7 +53,7 @@ Ptr<Expr> Parser::term()
 {
 	Ptr<Expr> expr = factor();
 
-	while (match({ TokenType::MINUS, TokenType::PLUS})) {
+	while (match({ TokenType::MINUS, TokenType::PLUS })) {
 		Ptr<Token> op = previous();
 		Ptr<Expr> right = factor();
 		expr = std::make_shared<BinaryExpr>(expr, op, right);
@@ -95,6 +95,8 @@ Ptr<Expr> Parser::primary()
 		return std::make_shared<LiteralExpr>(previous());
 	}
 
+	if (match({ TokenType::THIS })) return std::make_shared<ThisExpr>(previous());
+
 	if (match({ TokenType::IDENTIFIER })) {
 		return std::make_shared<VariableExpr>(previous());
 	}
@@ -123,13 +125,26 @@ Ptr<Expr> Parser::assignment()
 		Ptr<Token> equals = previous();
 		Ptr<Expr> value = assignment();
 
-		try {
+		Ptr<VariableExpr> var = std::dynamic_pointer_cast<VariableExpr>(expr);
+		Ptr<GetExpr> get = std::dynamic_pointer_cast<GetExpr>(expr);
+
+		if (var != nullptr) {
+			return std::make_shared<AssignExpr>(var->name, value, mode);
+		}
+		else if (get != nullptr) {
+			return std::make_shared<SetExpr>(get->object, get->name, value);
+		}
+		else {
+			throw ParseError("Invalid assignment target.", equals->line);
+		}
+
+		/*try {
 			VariableExpr& var = dynamic_cast<VariableExpr&>(*expr);
 			return std::make_shared<AssignExpr>(var.name, value, mode);
 		}
 		catch (const std::bad_cast& e) {
 			throw ParseError("Invalid assignment target.", equals->line);
-		}
+		}*/
 	}
 
 	return expr;
@@ -168,6 +183,10 @@ Ptr<Expr> Parser::call()
 	while (true) {
 		if (match({ TokenType::LEFT_PAREN })) {
 			expr = finishCall(expr);
+		}
+		else if (match({ TokenType::DOT })) {
+			Ptr<Token> name = consume(TokenType::IDENTIFIER, "Expected property name after '.'.");
+			expr = std::make_shared<GetExpr>(expr, name);
 		}
 		else {
 			break;
@@ -224,6 +243,7 @@ Ptr<Stmt> Parser::expressionStatement()
 Ptr<Stmt> Parser::declaration()
 {
 	try {
+		if (match({ TokenType::CLASS })) return classDeclaration();
 		if (match({ TokenType::FUNC })) return function("function");
 		if (match({ TokenType::VAR })) return varDeclaration();
 		return statement();
@@ -364,6 +384,21 @@ Ptr<Stmt> Parser::returnStatement()
 
 	consume(TokenType::SEMICOLON, "Expected ';' after return value.");
 	return std::make_shared<ReturnStmt>(keyword, value);
+}
+
+Ptr<ClassStmt> Parser::classDeclaration()
+{
+	Ptr<Token> name = consume(TokenType::IDENTIFIER, "Expected class name.");
+	consume(TokenType::LEFT_BRACE, "Expected '{' before class body.");
+
+	std::vector<Ptr<FunctionStmt>> methods;
+	while (!check(TokenType::RIGHT_BRACE) && !isAtEnd()) {
+		methods.push_back(function("method"));
+	}
+
+	consume(TokenType::RIGHT_BRACE, "Expected '}' after class body.");
+
+	return std::make_shared<ClassStmt>(name, methods);
 }
 
 void Parser::synchronize() {

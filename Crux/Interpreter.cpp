@@ -138,6 +138,46 @@ void Interpreter::visitCall(Ptr<CallExpr> expr)
 	m_results.push(obj);
 }
 
+void Interpreter::visitGet(Ptr<GetExpr> expr)
+{
+	eval(expr->object);
+	Ptr<CruxObject> object = m_results.top();
+	m_results.pop();
+
+	Ptr<CruxInstance> instance = std::dynamic_pointer_cast<CruxInstance>(object);
+	if (instance == nullptr) {
+		throw CruxRuntimeError("Only instances can have properties", expr->name->line, expr->name->lexeme);
+	}
+
+	Ptr<CruxObject> prop = instance->get(expr->name);
+	m_results.push(prop);
+}
+
+void Interpreter::visitSet(Ptr<SetExpr> expr)
+{
+	eval(expr->object);
+	Ptr<CruxObject> object = m_results.top();
+	m_results.pop();
+
+	Ptr<CruxInstance> instance = std::dynamic_pointer_cast<CruxInstance>(object);
+	if (instance == nullptr) {
+		throw CruxRuntimeError("Only instances have fields", expr->name->line, expr->name->lexeme);
+	}
+
+	eval(expr->value);
+	Ptr<CruxObject> value = m_results.top();
+	m_results.pop();
+
+	instance->set(expr->name, value);
+}
+
+void Interpreter::visitThis(Ptr<ThisExpr> expr)
+{
+	m_results.push(m_env->get(expr->keyword));
+	// TODO: This should use lookUpVariable, but it does not work... investigate why.
+	// m_results.push(lookUpVariable(expr->keyword, expr));
+}
+
 void Interpreter::visitUnary(Ptr<UnaryExpr> unary) {
 	eval(unary->right);
 
@@ -433,4 +473,19 @@ void Interpreter::visitReturnStmt(Ptr<ReturnStmt> stmt)
 	}
 
 	throw CruxReturn(m_results.top());
+}
+
+void Interpreter::visitClassStmt(Ptr<ClassStmt> stmt)
+{
+	m_env->define(stmt->name->lexeme, nullptr);
+
+	std::map<std::string, Ptr<CruxFunction>> methods;
+
+	for (Ptr<FunctionStmt>& method : stmt->methods) {
+		Ptr<CruxFunction> function = std::make_shared<CruxFunction>(method, m_env);
+		methods[method->name->lexeme] = function;
+	}
+
+	Ptr<CruxClass> cClass = std::make_shared<CruxClass>(stmt->name->lexeme, methods);
+	m_env->assign(stmt->name, cClass);
 }

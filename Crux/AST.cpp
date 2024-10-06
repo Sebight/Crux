@@ -157,3 +157,47 @@ void ReturnStmt::accept(Visitor& visitor)
 {
 	visitor.visitReturnStmt(static_pointer_cast<ReturnStmt>(shared_from_this()));
 }
+
+ClassStmt::ClassStmt(Ptr<Token> name, std::vector<Ptr<FunctionStmt>> methods)
+{
+	this->name = std::move(name);
+	this->methods = std::move(methods);
+}
+
+void ClassStmt::accept(Visitor& visitor)
+{
+	visitor.visitClassStmt(static_pointer_cast<ClassStmt>(shared_from_this()));
+}
+
+GetExpr::GetExpr(Ptr<Expr> object, Ptr<Token> name)
+{
+	this->object = std::move(object);
+	this->name = std::move(name);
+}
+
+void GetExpr::accept(Visitor& visitor)
+{
+	visitor.visitGet(static_pointer_cast<GetExpr>(shared_from_this()));
+}
+
+SetExpr::SetExpr(Ptr<Expr> object, Ptr<Token> name, Ptr<Expr> value)
+{
+	this->object = std::move(object);
+	this->name = std::move(name);
+	this->value = std::move(value);
+}
+
+void SetExpr::accept(Visitor& visitor)
+{
+	visitor.visitSet(static_pointer_cast<SetExpr>(shared_from_this()));
+}
+
+ThisExpr::ThisExpr(Ptr<Token> keyword)
+{
+	this->keyword = std::move(keyword);
+}
+
+void ThisExpr::accept(Visitor& visitor)
+{
+	visitor.visitThis(static_pointer_cast<ThisExpr>(shared_from_this()));
+}

@@ -1,0 +1,8 @@
+class MyClass {
+	f() {
+		print(this);
+	}
+}
+
+// MyClass().f();
+print(this);

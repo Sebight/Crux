@@ -1,5 +1,5 @@
 #include "CruxFunction.h"
-#include "CruxFunction.h"
+#include "CruxInstance.h"
 #include "Interpreter.h"
 
 Ptr<CruxObject> CruxFunction::call(Ptr<Interpreter> interpreter, std::vector<Ptr<CruxObject>> arguments) {
@@ -21,4 +21,11 @@ Ptr<CruxObject> CruxFunction::call(Ptr<Interpreter> interpreter, std::vector<Ptr
 int CruxFunction::arity()
 {
 	return m_declaration->params.size();
+}
+
+Ptr<CruxFunction> CruxFunction::bind(Ptr<CruxInstance> instance)
+{
+	Ptr<Env> env = std::make_shared<Env>(m_closure);
+	env->define("this", instance);
+	return std::make_shared<CruxFunction>(m_declaration, env);
 }

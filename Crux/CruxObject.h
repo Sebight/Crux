@@ -6,7 +6,7 @@
 #include "Types.h"
 #include <vector>
 
-class CruxObject : std::enable_shared_from_this<CruxObject> {
+class CruxObject : public std::enable_shared_from_this<CruxObject> {
 public:
 	std::string str;
 	double num;

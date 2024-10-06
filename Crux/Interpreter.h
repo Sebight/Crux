@@ -12,6 +12,9 @@
 #include "CruxObject.h"
 #include "CruxCallable.h"
 #include "CruxFunction.h"
+#include <map>
+#include "CruxClass.h"
+#include "CruxInstance.h"
 
 class Interpreter : public Visitor {
 public:
@@ -39,6 +42,9 @@ public:
 	void visitLogical(Ptr<LogicalExpr> expr) override;
 
 	void visitCall(Ptr<CallExpr> expr) override;
+	void visitGet(Ptr<GetExpr> expr) override;
+	void visitSet(Ptr<SetExpr> expr) override;
+	void visitThis(Ptr<ThisExpr> expr) override;
 
 	void visitExprStmt(Ptr<ExprStmt> stmt) override;
 	void visitPrintStmt(Ptr<PrintStmt> stmt) override;
@@ -48,6 +54,7 @@ public:
 	void visitWhileStmt(Ptr<WhileStmt> stmt) override;
 	void visitFunctionStmt(Ptr<FunctionStmt> stmt) override;
 	void visitReturnStmt(Ptr<ReturnStmt> stmt) override;
+	void visitClassStmt(Ptr<ClassStmt> stmt) override;
 
 	void interpret(std::vector<Ptr<Stmt>> statements);
 	void execute(Ptr<Stmt> stmt);

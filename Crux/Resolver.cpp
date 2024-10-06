@@ -66,6 +66,26 @@ void Resolver::visitReturnStmt(Ptr<ReturnStmt> stmt)
 	}
 }
 
+void Resolver::visitClassStmt(Ptr<ClassStmt> stmt)
+{
+	ClassType enclosingClass = m_currentClass;
+	m_currentClass = ClassType::Class;
+	declare(stmt->name);
+
+	beginScope();
+	m_scopes.back()["this"] = true;
+
+	for (Ptr<FunctionStmt>& method : stmt->methods) {
+		FunctionType decl = FunctionType::Method;
+		resolveFunction(method, decl);
+	}
+	endScope();
+
+	m_currentClass = enclosingClass;
+
+	define(stmt->name);
+}
+
 void Resolver::resolve(std::vector<Ptr<Stmt>> statements)
 {
 	try {
@@ -190,4 +210,24 @@ void Resolver::visitCall(Ptr<CallExpr> expr)
 	{
 		resolve(arg);
 	}
+}
+
+void Resolver::visitGet(Ptr<GetExpr> expr)
+{
+	resolve(expr->object);
+}
+
+void Resolver::visitSet(Ptr<SetExpr> expr)
+{
+	resolve(expr->value);
+	resolve(expr->object);
+}
+
+void Resolver::visitThis(Ptr<ThisExpr> expr)
+{
+	if (m_currentClass == ClassType::None) {
+		throw CruxResolverError("Can't use <this> outside of a class.", expr->keyword->line, expr->keyword->lexeme);
+	}
+
+	resolveLocal(expr, expr->keyword);
 }
