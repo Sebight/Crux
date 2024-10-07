@@ -20,5 +20,3 @@ class C : B {
 var c = C();
 
 c.func();
-
-print super.get();

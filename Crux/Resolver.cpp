@@ -137,9 +137,9 @@ void Resolver::resolve(Ptr<Expr> expr)
 
 void Resolver::resolveLocal(Ptr<Expr> expr, Ptr<Token> name)
 {
-	for (int i = m_scopes.size() - 1; i >= 0; i--) {
+	for (int i = static_cast<int>(m_scopes.size()) - 1; i >= 0; i--) {
 		if (m_scopes[i].find(name->lexeme) != m_scopes[i].end()) {
-			m_interpreter->resolve(expr, m_scopes.size() - 1 - i);
+			m_interpreter->resolve(expr, static_cast<int>(m_scopes.size()) - 1 - i);
 			return;
 		}
 	}
