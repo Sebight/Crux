@@ -158,10 +158,11 @@ void ReturnStmt::accept(Visitor& visitor)
 	visitor.visitReturnStmt(static_pointer_cast<ReturnStmt>(shared_from_this()));
 }
 
-ClassStmt::ClassStmt(Ptr<Token> name, std::vector<Ptr<FunctionStmt>> methods)
+ClassStmt::ClassStmt(Ptr<Token> name, std::vector<Ptr<FunctionStmt>> methods, Ptr<VariableExpr> superclass)
 {
 	this->name = std::move(name);
 	this->methods = std::move(methods);
+	this->superclass = std::move(superclass);
 }
 
 void ClassStmt::accept(Visitor& visitor)
@@ -201,4 +202,15 @@ ThisExpr::ThisExpr(Ptr<Token> keyword)
 void ThisExpr::accept(Visitor& visitor)
 {
 	visitor.visitThis(static_pointer_cast<ThisExpr>(shared_from_this()));
+}
+
+SuperExpr::SuperExpr(Ptr<Token> keyword, Ptr<Token> method)
+{
+	this->keyword = std::move(keyword);
+	this->method = std::move(method);
+}
+
+void SuperExpr::accept(Visitor& visitor)
+{
+	visitor.visitSuper(static_pointer_cast<SuperExpr>(shared_from_this()));
 }

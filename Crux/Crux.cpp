@@ -70,7 +70,6 @@ void Crux::run(const std::string& source)
 
 	// TODO: Errors
 	//if (hadError) return;
-
 	interpreter.interpret(statements);
 }
 

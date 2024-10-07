@@ -95,6 +95,13 @@ Ptr<Expr> Parser::primary()
 		return std::make_shared<LiteralExpr>(previous());
 	}
 
+	if (match({ TokenType::SUPER })) {
+		Ptr<Token> keyword = previous();
+		consume(TokenType::DOT, "Expected '.' after 'super'.");
+		Ptr<Token> method = consume(TokenType::IDENTIFIER, "Expected superclass method name.");
+		return std::make_shared<SuperExpr>(keyword, method);
+	}
+
 	if (match({ TokenType::THIS })) return std::make_shared<ThisExpr>(previous());
 
 	if (match({ TokenType::IDENTIFIER })) {
@@ -381,6 +388,13 @@ Ptr<Stmt> Parser::returnStatement()
 Ptr<ClassStmt> Parser::classDeclaration()
 {
 	Ptr<Token> name = consume(TokenType::IDENTIFIER, "Expected class name.");
+
+	Ptr<VariableExpr> superclass = nullptr;
+	if (match({ TokenType::INHERIT })) {
+		consume(TokenType::IDENTIFIER, "Expected superclass name.");
+		superclass = std::make_shared<VariableExpr>(previous());
+	}
+
 	consume(TokenType::LEFT_BRACE, "Expected '{' before class body.");
 
 	std::vector<Ptr<FunctionStmt>> methods;
@@ -390,7 +404,7 @@ Ptr<ClassStmt> Parser::classDeclaration()
 
 	consume(TokenType::RIGHT_BRACE, "Expected '}' after class body.");
 
-	return std::make_shared<ClassStmt>(name, methods);
+	return std::make_shared<ClassStmt>(name, methods, superclass);
 }
 
 void Parser::synchronize() {

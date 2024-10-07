@@ -26,6 +26,7 @@ void Scanner::scanToken()
 	case '-': addToken(match('=') ? TokenType::MINUS_EQUAL : TokenType::MINUS); break;
 	case '+': addToken(match('=') ? TokenType::PLUS_EQUAL : TokenType::PLUS); break;
 	case ';': addToken(TokenType::SEMICOLON); break;
+	case ':': addToken(TokenType::INHERIT); break;
 	case '*': addToken(TokenType::STAR); break;
 	case '!': addToken(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG); break;
 	case '=': addToken(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL); break;

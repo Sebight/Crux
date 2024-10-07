@@ -134,7 +134,7 @@ void Interpreter::visitCall(Ptr<CallExpr> expr)
 		throw CruxRuntimeError("Expected " + std::to_string(function->arity()) + " arguments but got " + std::to_string(expr->arguments.size()), expr->paren->line, expr->paren->lexeme);
 	}
 
-	Ptr<CruxObject> obj = function->call(std::make_shared<Interpreter>(m_env, m_globals), args);
+	Ptr<CruxObject> obj = function->call(this, args);
 	m_results.push(obj);
 }
 
@@ -196,7 +196,8 @@ void Interpreter::visitSet(Ptr<SetExpr> expr)
 
 		value->num = instance->get(expr->name)->num + value->num;
 		instance->set(expr->name, value);
-	} else if (expr->operation == SetExpr::SetOperation::MINUS_ASSIGN) {
+	}
+	else if (expr->operation == SetExpr::SetOperation::MINUS_ASSIGN) {
 		if (bTypeCheck(expr->name, value, TokenType::STRING)) {
 			throw CruxRuntimeError("Unsupported operator.", expr->name->line, expr->name->lexeme);
 			return;
@@ -215,6 +216,22 @@ void Interpreter::visitThis(Ptr<ThisExpr> expr)
 	m_results.push(m_env->get(expr->keyword));
 	// TODO: This should use lookUpVariable, but it does not work... investigate why.
 	// m_results.push(lookUpVariable(expr->keyword, expr));
+}
+
+void Interpreter::visitSuper(Ptr<SuperExpr> expr)
+{
+	int dist = m_locals[expr];
+
+	Ptr<CruxClass> superclass = std::dynamic_pointer_cast<CruxClass>(m_env->getAt(dist, "super"));
+
+	Ptr<CruxInstance> object = std::dynamic_pointer_cast<CruxInstance>(m_env->getAt(dist - 1, "this"));
+
+	Ptr<CruxFunction> method = superclass->findMethod(expr->method->lexeme);
+	if (method == nullptr) {
+		throw CruxRuntimeError("Undefined property '" + expr->method->lexeme + "'", expr->method->line, expr->method->lexeme);
+	}
+
+	m_results.push(method->bind(object));
 }
 
 void Interpreter::visitUnary(Ptr<UnaryExpr> unary) {
@@ -520,7 +537,23 @@ void Interpreter::visitReturnStmt(Ptr<ReturnStmt> stmt)
 
 void Interpreter::visitClassStmt(Ptr<ClassStmt> stmt)
 {
+	Ptr<CruxClass> superclass = nullptr;
+	if (stmt->superclass != nullptr) {
+		eval(stmt->superclass);
+		superclass = std::dynamic_pointer_cast<CruxClass>(m_results.top());
+		m_results.pop();
+
+		if (!superclass) {
+			throw CruxRuntimeError("Superclass must be a class", stmt->superclass->name->line, stmt->superclass->name->lexeme);
+		}
+	}
+
 	m_env->define(stmt->name->lexeme, nullptr);
+
+	if (stmt->superclass != nullptr) {
+		m_env = std::make_shared<Env>(m_env);
+		m_env->define("super", superclass);
+	}
 
 	std::map<std::string, Ptr<CruxFunction>> methods;
 	for (Ptr<FunctionStmt>& method : stmt->methods) {
@@ -528,6 +561,13 @@ void Interpreter::visitClassStmt(Ptr<ClassStmt> stmt)
 		methods[method->name->lexeme] = function;
 	}
 
-	Ptr<CruxClass> cClass = std::make_shared<CruxClass>(stmt->name->lexeme, methods);
+
+
+	Ptr<CruxClass> cClass = std::make_shared<CruxClass>(stmt->name->lexeme, superclass, methods);
+
+	if (superclass != nullptr) {
+		m_env = m_env->enclosing();
+	}
+
 	m_env->assign(stmt->name, cClass);
 }

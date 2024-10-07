@@ -14,6 +14,7 @@ class CallExpr;
 class GetExpr;
 class SetExpr;
 class ThisExpr;
+class SuperExpr;
 
 class ExprStmt;
 class PrintStmt;
@@ -41,6 +42,7 @@ public:
 	virtual void visitGet(Ptr<GetExpr>) = 0;
 	virtual void visitSet(Ptr<SetExpr>) = 0;
 	virtual void visitThis(Ptr<ThisExpr>) = 0;
+	virtual void visitSuper(Ptr<SuperExpr>) = 0;
 
 	virtual void visitExprStmt(Ptr<ExprStmt>) = 0;
 	virtual void visitPrintStmt(Ptr<PrintStmt>) = 0;

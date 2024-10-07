@@ -11,7 +11,8 @@ enum class FunctionType {
 
 enum class ClassType {
 	None, 
-	Class
+	Class,
+	Subclass
 };
 
 class Resolver : public Visitor {
@@ -29,6 +30,7 @@ public:
 	void visitGet(Ptr<GetExpr> expr) override;
 	void visitSet(Ptr<SetExpr> expr) override;
 	void visitThis(Ptr<ThisExpr> expr) override;
+	void visitSuper(Ptr<SuperExpr> expr) override;
 
 	void visitExprStmt(Ptr<ExprStmt> stmt) override;
 	void visitPrintStmt(Ptr<PrintStmt> stmt) override;

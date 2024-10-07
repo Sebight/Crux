@@ -5,7 +5,7 @@
 #include "CruxObject.h"
 #include "Types.h"
 
-class Env {
+class Env : public std::enable_shared_from_this<Env> {
 public:
 	Env() = default;
 	Env(Ptr<Env> enclosing) : m_enclosing(enclosing) { }
@@ -53,7 +53,7 @@ public:
 	}
 
 	Ptr<Env> ancestor(int distance) {
-		Ptr<Env> env = m_enclosing;
+		Ptr<Env> env = shared_from_this();
 		for (int i = 0; i < distance; i++) {
 			env = env->m_enclosing;
 		}
@@ -78,6 +78,10 @@ public:
 		if (rec && m_enclosing != nullptr) {
 			m_enclosing->dump(true);
 		}
+	}
+
+	Ptr<Env> enclosing() {
+		return m_enclosing;
 	}
 private:
 	std::unordered_map<std::string, Ptr<CruxObject>> m_values;

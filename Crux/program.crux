@@ -1,26 +1,24 @@
-class Counter {
-	Counter(initialValue) {
-		this.value = initialValue;
+class A {
+	func() {
+		print("A");
 	}
-
-	Add() {
-		this.value += 1;
-	}
-
-	Subtract() {
-		this.value -= 1;
-	}
-
-	Get() {
-		return this.value;
+}
+class B : A {
+	func() {
+		super.func();
+		print("B");
 	}
 }
 
-var counter = Counter(0);
+class C : B {
+	func() {
+		super.func();
+		print("C");
+	}
+}
 
-counter.Add();
-counter.Add();
-counter.Add();
-counter.Subtract();
+var c = C();
 
-print(counter.Get());
+c.func();
+
+print super.get();

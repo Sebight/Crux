@@ -16,7 +16,7 @@
 #include "CruxClass.h"
 #include "CruxInstance.h"
 
-class Interpreter : public Visitor {
+class Interpreter : public Visitor, public std::enable_shared_from_this<Interpreter> {
 public:
 	Interpreter() {
 		m_globals = std::make_shared<Env>();
@@ -45,6 +45,7 @@ public:
 	void visitGet(Ptr<GetExpr> expr) override;
 	void visitSet(Ptr<SetExpr> expr) override;
 	void visitThis(Ptr<ThisExpr> expr) override;
+	void visitSuper(Ptr<SuperExpr> expr) override;
 
 	void visitExprStmt(Ptr<ExprStmt> stmt) override;
 	void visitPrintStmt(Ptr<PrintStmt> stmt) override;

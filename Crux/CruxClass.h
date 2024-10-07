@@ -4,11 +4,9 @@ class CruxFunction;
 
 class CruxClass : public CruxCallable {
 public:
-	CruxClass(std::string name, std::map<std::string, Ptr<CruxFunction>> methods) : m_name(name), m_methods(methods) {}
+	CruxClass(std::string name, Ptr<CruxClass> superclass, std::map<std::string, Ptr<CruxFunction>> methods) : m_name(name), m_methods(methods), m_superclass(superclass) {}
 
-	std::string toString() {
-		return m_name;
-	}
+	std::string toString();
 
 	int arity() override;
 
@@ -18,8 +16,9 @@ public:
 
 	Ptr<CruxFunction> findMethod(std::string name);
 
-	Ptr<CruxObject> call(Ptr<Interpreter> interpreter, std::vector<Ptr<CruxObject>> arguments) override;
+	Ptr<CruxObject> call(Interpreter* interpreter, std::vector<Ptr<CruxObject>> arguments) override;
 private:
 	std::string m_name;
 	std::map<std::string, Ptr<CruxFunction>> m_methods;
+	Ptr<CruxClass> m_superclass;
 };

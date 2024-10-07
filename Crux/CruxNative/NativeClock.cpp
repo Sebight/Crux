@@ -1,6 +1,6 @@
 #include "NativeClock.h"
 
-Ptr<CruxObject> NativeClock::call(Ptr<Interpreter> interpreter, std::vector<Ptr<CruxObject>> arguments)
+Ptr<CruxObject> NativeClock::call(Interpreter* interpreter, std::vector<Ptr<CruxObject>> arguments)
 {
 	auto now = std::chrono::system_clock::now();
 	auto duration = now.time_since_epoch();

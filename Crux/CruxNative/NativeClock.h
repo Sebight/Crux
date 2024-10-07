@@ -7,5 +7,5 @@ public:
 	int arity() override {
 		return 0;
 	}
-	Ptr<CruxObject> call(Ptr<Interpreter> interpreter, std::vector<Ptr<CruxObject>> arguments) override;
+	Ptr<CruxObject> call(Interpreter* interpreter, std::vector<Ptr<CruxObject>> arguments) override;
 };

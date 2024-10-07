@@ -77,7 +77,19 @@ void Resolver::visitClassStmt(Ptr<ClassStmt> stmt)
 	m_currentClass = ClassType::Class;
 	declare(stmt->name);
 
+	if (stmt->superclass != nullptr && stmt->name->lexeme == stmt->superclass->name->lexeme) {
+		throw CruxResolverError("A class cannot inherit from itself.");
+	}
+
+	if (stmt->superclass != nullptr) {
+		m_currentClass = ClassType::Subclass;
+		resolve(stmt->superclass);
+		beginScope();	
+		m_scopes.back()["super"] = true;
+	}
+
 	beginScope();
+
 	m_scopes.back()["this"] = true;
 
 	for (Ptr<FunctionStmt>& method : stmt->methods) {
@@ -90,6 +102,10 @@ void Resolver::visitClassStmt(Ptr<ClassStmt> stmt)
 		resolveFunction(method, decl);
 	}
 	endScope();
+
+	if (stmt->superclass != nullptr) {
+		endScope();
+	}
 
 	m_currentClass = enclosingClass;
 
@@ -240,5 +256,16 @@ void Resolver::visitThis(Ptr<ThisExpr> expr)
 		throw CruxResolverError("Can't use <this> outside of a class.", expr->keyword->line, expr->keyword->lexeme);
 	}
 
+	resolveLocal(expr, expr->keyword);
+}
+
+void Resolver::visitSuper(Ptr<SuperExpr> expr)
+{
+	if (m_currentClass == ClassType::None) {
+		throw CruxResolverError("Can't use <super> outside of a class.", expr->keyword->line, expr->keyword->lexeme);
+	}
+	else if (m_currentClass != ClassType::Subclass) {
+		throw CruxResolverError("Can't use <super> in a class with no superclass.", expr->keyword->line, expr->keyword->lexeme);
+	}
 	resolveLocal(expr, expr->keyword);
 }

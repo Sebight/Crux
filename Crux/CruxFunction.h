@@ -8,7 +8,7 @@ class CruxFunction : public CruxCallable {
 public:
 	CruxFunction(Ptr<FunctionStmt> declaration, Ptr<Env> closure, bool isConstructor) : m_declaration(std::move(declaration)), m_closure(closure), m_isConstructor(isConstructor) {}
 	
-	Ptr<CruxObject> call(Ptr<Interpreter> interpreter, std::vector<Ptr<CruxObject>> arguments) override;
+	Ptr<CruxObject> call(Interpreter* interpreter, std::vector<Ptr<CruxObject>> arguments) override;
 	int arity() override;
 	
 	Ptr<CruxFunction> bind(Ptr<CruxInstance> instance);

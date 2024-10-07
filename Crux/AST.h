@@ -126,6 +126,15 @@ public:
 	void accept(Visitor& visitor) override;
 };
 
+class SuperExpr : public Expr {
+public:
+	Ptr<Token> keyword;
+	Ptr<Token> method;
+
+	SuperExpr(Ptr<Token> keyword, Ptr<Token> method);
+	void accept(Visitor& visitor) override;
+};
+
 class Stmt : public ASTNode, public std::enable_shared_from_this<Stmt> {
 public:
 	Stmt() = default;
@@ -207,7 +216,8 @@ class ClassStmt : public Stmt {
 public:
 	Ptr<Token> name;
 	std::vector<Ptr<FunctionStmt>> methods;
+	Ptr<VariableExpr> superclass;
 
-	ClassStmt(Ptr<Token> name, std::vector<Ptr<FunctionStmt>> methods);
+	ClassStmt(Ptr<Token> name, std::vector<Ptr<FunctionStmt>> methods, Ptr<VariableExpr> superclass);
 	void accept(Visitor& visitor) override;
 };

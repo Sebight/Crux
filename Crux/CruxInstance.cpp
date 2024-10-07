@@ -26,5 +26,5 @@ void CruxInstance::set(Ptr<Token> name, Ptr<CruxObject> value)
 
 std::string CruxInstance::toString()
 {
-	return m_klass->getName() + " instance";
+	return "instance<"+m_klass->getName()+">";
 }

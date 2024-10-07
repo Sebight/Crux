@@ -2,7 +2,7 @@
 #include "CruxInstance.h"
 #include "Interpreter.h"
 
-Ptr<CruxObject> CruxFunction::call(Ptr<Interpreter> interpreter, std::vector<Ptr<CruxObject>> arguments) {
+Ptr<CruxObject> CruxFunction::call(Interpreter* interpreter, std::vector<Ptr<CruxObject>> arguments) {
 	Ptr<Env> funcEnv = std::make_shared<Env>(m_closure);
 	for (int i = 0; i < m_declaration->params.size(); i++) {
 		funcEnv->define(m_declaration->params[i]->lexeme, arguments[i]);
