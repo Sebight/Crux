@@ -98,4 +98,22 @@ private:
 			throw CruxRuntimeError(message);
 		}
 	}
+
+	void dumpStack() {
+		printf("Stack dump:\n");
+		std::stack<Ptr<CruxObject>> temp;
+		while (!m_results.empty()) {
+			auto obj = m_results.top();
+			m_results.pop();
+			temp.push(obj);
+			printf("%s\n", obj->toString().c_str());
+		}
+
+		while (!temp.empty()) {
+			m_results.push(temp.top());
+			temp.pop();
+		}
+
+		printf("---\n");
+	}
 };

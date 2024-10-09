@@ -1,22 +1,8 @@
-class A {
-	func() {
-		print("A");
-	}
-}
-class B : A {
-	func() {
-		super.func();
-		print("B");
-	}
+var i = 0;
+
+{
+	print(i);
+	i += 1;
 }
 
-class C : B {
-	func() {
-		super.func();
-		print("C");
-	}
-}
-
-var c = C();
-
-c.func();
+print(i);

@@ -49,7 +49,6 @@ void Interpreter::visitAssign(Ptr<AssignExpr> expr)
 	eval(expr->value);
 	Ptr<CruxObject> value = m_results.top();
 	m_results.pop();
-
 	if (expr->mode == 1) {
 		m_env->assign(expr->name, value);
 		return;
@@ -83,13 +82,15 @@ void Interpreter::visitAssign(Ptr<AssignExpr> expr)
 		value->num = current->num - value->num;
 	}
 
-	int dist = m_locals.find(expr) != m_locals.end() ? m_locals[expr] : -1;
+	m_env->assign(expr->name, value);
+
+	/*int dist = m_locals.find(expr) != m_locals.end() ? m_locals[expr] : -1;
 	if (dist != -1) {
 		m_env->assignAt(dist, expr->name, value);
 		return;
 	}
 
-	m_globals->assign(expr->name, value);
+	m_globals->assign(expr->name, value);*/
 }
 
 void Interpreter::visitLogical(Ptr<LogicalExpr> expr)
