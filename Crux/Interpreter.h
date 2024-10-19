@@ -15,12 +15,14 @@
 #include <map>
 #include "CruxClass.h"
 #include "CruxInstance.h"
+#include "CruxList.h"
 
 class Interpreter : public Visitor, public std::enable_shared_from_this<Interpreter> {
 public:
 	Interpreter() {
 		m_globals = std::make_shared<Env>();
 		m_globals->define("clock", std::make_shared<NativeClock>());
+		m_globals->define("List", std::make_shared<CruxListConstructor>());
 
 		m_env = m_globals;
 	}

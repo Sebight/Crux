@@ -7,7 +7,7 @@ class CruxInstance : public CruxObject {
 public:
 	CruxInstance(Ptr<CruxClass> klass) : m_klass(klass) {}
 
-	Ptr<CruxObject> get(Ptr<Token> name);
+	virtual Ptr<CruxObject> get(Ptr<Token> name);
 	void set(Ptr<Token> name, Ptr<CruxObject> value);
 
 	std::string toString();

@@ -1,8 +1,15 @@
-var i = 0;
+var list = List();
 
-{
-	print(i);
-	i += 1;
+for (var i = 0; i < 10; i += 1) {
+  list.push(i);
 }
 
-print(i);
+var avg = 0;
+
+for (var i = 0; i < list.size; i += 1) {
+	avg += list.get(i);
+}
+
+avg = avg / list.size;
+
+print(avg);
